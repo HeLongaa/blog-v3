@@ -40,8 +40,6 @@ export default defineNuxtConfig({
       ...routeRules,
       // 确保静态资源不被优化处理
       '/assets/**': { headers: { 'Cache-Control': 'max-age=31536000' } },
-      // 跳过IPX图像处理以避免URI错误
-      '/_ipx/**': { prerender: false }
     }
   },
 	compatibilityDate: '2024-08-03',
@@ -133,7 +131,7 @@ ${packageJson.homepage}
 ================================
 `)
 		},
-		'content:file:afterParse': (ctx) => {
+		'content:file:afterParse': (ctx: any) => {
 			// 在 URL 中隐藏指定目录前缀的路径
 			for (const prefix of blogConfig.hideContentPrefixes) {
 				const realPath = ctx.content.path as string
