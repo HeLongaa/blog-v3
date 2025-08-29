@@ -53,16 +53,18 @@ export default defineAppConfig({
 			{
 				title: '探索',
 				items: [
-					{ icon: 'ph:rss-simple-bold', text: 'Atom订阅', url: '/atom.xml' },
-					{ icon: 'ph:subway-bold', text: '开往', url: 'https://www.travellings.cn/' },
+					{ icon: 'ph:rss-simple-bold', text: '本站订阅', url: '/atom.xml' },
+					{ icon: 'ph:github-logo-bold', text: 'HeLongaa', url: 'https://github.com/HeLongaa' },
+					{ icon: 'ph:envelope-simple-bold', text: blogConfig.author.email, url: `mailto:${blogConfig.author.email}` },
 				],
 			},
 			{
-				title: '社交',
+				title: '说明',
 				items: [
-					{ icon: 'ph:github-logo-bold', text: 'L33Z22L11', url: 'https://github.com/L33Z22L11' },
-					{ icon: 'ri:qq-line', text: '群: 169994096', url: 'https://jq.qq.com/?_wv=1027&k=lQfNSeEd' },
-					{ icon: 'ph:envelope-simple-bold', text: blogConfig.author.email, url: `mailto:${blogConfig.author.email}` },
+					
+					{ icon: 'ph:shield-bold', text: '隐私声明', url: '/info/privacy' },
+					{ icon: 'ph:info-bold', text: '免责声明', url: '/info/disclaimer' },
+					{ icon: 'ph:arrow-square-out-bold', text: '外链说明', url: '/info/about-link' },
 				],
 			},
 			{
@@ -70,7 +72,7 @@ export default defineAppConfig({
 				items: [
 					{ icon: 'simple-icons:nuxtdotjs', text: 'Nuxt开源博客主题', url: 'https://github.com/L33Z22L11/blog-v3' },
 					{ icon: 'ph:swatches-bold', text: '主题和组件文档', url: '/theme' },
-					{ icon: 'ph:certificate-bold', text: '陕ICP备2025072742号-3', url: 'https://beian.miit.gov.cn/' },
+					{ icon: 'ph:certificate-bold', text: '陇ICP备2024006356号-2', url: 'https://beian.miit.gov.cn/' },
 				],
 			},
 		] satisfies Nav,
@@ -92,7 +94,7 @@ export default defineAppConfig({
 			items: [
 				{ icon: 'ph:files-bold', text: '文章', url: '/' },
 				{ icon: 'ph:users-bold', text: '朋友动态', url: '/friends' },
-				{ icon: 'ph:lightning-bold', text: '瞬间', url: '/moments' },
+				{ icon: 'ph:lightning-bold', text: '瞬间', url: '/talking' },
 				{ icon: 'ph:link-bold', text: '友链', url: '/link' },
 				{ icon: 'ph:archive-bold', text: '归档', url: '/archive' },
 			],

@@ -1,22 +1,41 @@
 <template>
-<ZWidget
-	card
-	dim
-	title="博客/技术社区"
-	bg-img="https://p.qlogo.cn/gh/169994096/169994096/100/"
-	bg-right
+<a 
+	href="https://linux.do" 
+	target="_blank" 
+	rel="noopener noreferrer"
+	class="community-link"
 >
-	<div class="title">
-		纸网接入点
-	</div>
+	<ZWidget
+		card
+		dim
+		title="社区推荐"
+		bg-img="https://oss.helong.online/bucket-IMG/3f6a06f102be120040b8a761a4305322c115c2376bbd84e641c294db89d88d43.png"
+		bg-right
+	>
+		<div class="title">
+			Linux.do
+		</div>
 
-	<Tip copy icon="oui:empty" :tip-options="{ placement: 'left' }">
-		<Icon name="ri:qq-fill" />169994096
-	</Tip>
-</ZWidget>
+		<Tip icon="oui:empty" :tip-options="{ placement: 'left' }">
+			真诚、友善、团结、专业
+		</Tip>
+	</ZWidget>
+</a>
 </template>
 
 <style lang="scss" scoped>
+.community-link {
+	display: block;
+	text-decoration: none;
+	color: inherit;
+	transition: transform 0.2s ease, opacity 0.2s ease;
+	
+	&:hover {
+		transform: translateY(-2px);
+		opacity: 0.9;
+	}
+}
+
 .title {
 	background-clip: text;
 	background-image: linear-gradient(60deg, var(--c-accent) -30%, var(--c-primary), var(--c-text-1));

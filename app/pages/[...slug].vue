@@ -43,7 +43,6 @@ else {
 
 	<PostFooter v-bind="post" />
 	<PostSurround />
-	<PostComment />
 </template>
 
 <ZError

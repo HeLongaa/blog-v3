@@ -37,7 +37,7 @@ const loadPosts = async () => {
     // 尝试从缓存获取
     const cachedData = dataCacheStore.getCache<FriendPost[]>('friends-posts')
     if (cachedData && cachedData.length > 0) {
-      posts.value = cachedData.slice(0, 5) // 显示前5条
+      posts.value = cachedData.slice(0, 3) // 显示前3条
       loading.value = false
       return
     }

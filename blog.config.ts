@@ -35,7 +35,7 @@ const blogConfig = {
 	},
 
 	// 在 URL 中隐藏的路径前缀
-	hideContentPrefixes: ['/article'],
+	hideContentPrefixes: [''],
 
 	imageDomains: [
 		// 自动启用本域名的 Nuxt Image
