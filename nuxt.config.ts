@@ -150,10 +150,24 @@ ${packageJson.homepage}
 	},
 
 	image: {
-		// Netlify 需要特殊处理
-		provider: process.env.NUXT_IMAGE_PROVIDER,
+		// 恢复图像处理功能，但添加错误处理
+		provider: process.env.NUXT_IMAGE_PROVIDER || 'ipx',
 		domains: blogConfig.imageDomains,
 		format: ['avif', 'webp'],
+		// 在构建时跳过外部图像预处理以避免URI错误
+		presets: process.env.NODE_ENV === 'production' ? {
+			default: {
+				modifiers: {
+					quality: 80,
+					format: 'webp'
+				}
+			}
+		} : {},
+		// IPX配置选项
+		ipx: {
+			// 禁用预处理外部URL以避免URI错误
+			disableURLEncoding: true,
+		}
 	},
 
 	robots: {

@@ -48,8 +48,8 @@ else {
     />
 
     <PostFooter v-bind="post" />
-    <PostComment v-if="showComments" />
     <PostSurround />
+    <PostComment v-if="showComments" />
 </template>
 
 <ZError

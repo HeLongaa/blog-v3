@@ -41,6 +41,7 @@ const blogConfig = {
 		// 自动启用本域名的 Nuxt Image
 		// 'www.zhilu.site',
 		// '7.isyangs.cn',
+		'oss.helong.online',
 	],
 
 	// 禁止搜索引擎收录的路径
