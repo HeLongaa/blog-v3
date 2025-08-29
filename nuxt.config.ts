@@ -35,7 +35,13 @@ export default defineNuxtConfig({
 			id: 'z-root',
 		},
 	},
-
+	nitro: {
+    routeRules: {
+      ...routeRules,
+      // 确保静态资源不被优化处理
+      '/assets/**': { headers: { 'Cache-Control': 'max-age=31536000' } },
+    }
+  },
 	compatibilityDate: '2024-08-03',
 
 	components: [

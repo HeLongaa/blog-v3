@@ -1,50 +1,51 @@
 <script setup lang="ts">
+import ArtalkManager from '~/utils/artalk-manager'
+
 const appConfig = useAppConfig()
 const route = useRoute()
 const colorMode = useColorMode()
 
-// Artalk实例引用
-let artalkInstance: any = null
+const artalkManager = ArtalkManager.getInstance()
+
+const initArtalk = async () => {
+  try {
+    await artalkManager.init({
+      el: '#artalk',
+      pageKey: route.path,
+      pageTitle: document.title.replace(` | ${appConfig.title}`, ''),
+      server: appConfig.artalk?.server,
+      site: appConfig.artalk?.site,
+      emoticons: "/assets/Owo-Artalk.json",
+      darkMode: colorMode.value === 'dark'
+    })
+  } catch (error) {
+    console.error('评论系统初始化失败:', error)
+  }
+}
 
 onMounted(() => {
-	// 确保DOM完全加载后再初始化Artalk
-	nextTick(() => {
-		const initArtalk = () => {
-			const artalkEl = document.getElementById('artalk')
-			// @ts-expect-error window上有Artalk实例
-			if (artalkEl && window.Artalk) {
-				try {
-					// @ts-expect-error Artalk类型
-					artalkInstance = window.Artalk.init({
-						el: '#artalk',
-						pageKey: route.path,
-						pageTitle: document.title.replace(` | ${appConfig.title}`, ''),
-						server: appConfig.artalk?.server,
-						site: appConfig.artalk?.site,
-						emoticons:"/assets/Owo-Artalk.json",
-						darkMode: colorMode.value === 'dark'
-					})
-				} catch (error) {
-					console.error('Artalk初始化失败:', error)
-				}
-			} else if (!artalkEl) {
-				console.error('未找到#artalk元素')
-			} else {
-				// 如果元素存在但Artalk还没加载，等待一下再重试
-				setTimeout(initArtalk, 200)
-			}
-		}
-		
-		// 延迟一点时间确保DOM完全渲染
-		setTimeout(initArtalk, 100)
-	})
+  // 确保DOM完全加载后再初始化Artalk
+  nextTick(() => {
+    setTimeout(initArtalk, 100)
+  })
+})
+
+// 路由变化时重新初始化
+watch(() => route.path, () => {
+  nextTick(() => {
+    setTimeout(initArtalk, 100)
+  })
 })
 
 // 监听主题变化
 watch(() => colorMode.value, (newMode) => {
-	if (artalkInstance && artalkInstance.setDarkMode) {
-		artalkInstance.setDarkMode(newMode === 'dark')
-	}
+  artalkManager.setDarkMode(newMode === 'dark')
+})
+
+// 组件卸载时清理
+onUnmounted(() => {
+  // 注意：这里不要清理全局实例，因为其他页面可能还在使用
+  // artalkManager.destroy()
 })
 </script>
 

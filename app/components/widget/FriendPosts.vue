@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import blogConfig from '~~/blog.config'
+import { decodeHtmlEntities } from '~/utils/html'
+
 interface FriendPost {
   domain: string
   title: string
@@ -42,7 +45,7 @@ const loadPosts = async () => {
       return
     }
 
-    const response = await fetch('https://blog-api.helong.online/n8n-file-data/rss_data')
+    const response = await fetch(blogConfig.data.api_endpoint + '/rss_data.json')
     if (!response.ok) throw new Error('Failed to fetch')
     
     const allPosts: FriendPost[] = await response.json()
@@ -94,7 +97,7 @@ onMounted(() => {
           @error="(e) => { (e.target as HTMLImageElement).src = '/favicon.ico' }"
         >
         <div class="post-meta">
-          <div class="author">{{ post.author }}</div>
+          <div class="author">{{ decodeHtmlEntities(post.author) }}</div>
           <div class="time">{{ formatRelativeTime(post.date) }}</div>
         </div>
       </div>
@@ -102,7 +105,7 @@ onMounted(() => {
       <div class="post-content">
         <h3 class="post-title">
           <a :href="post.link" target="_blank" rel="noopener noreferrer">
-            {{ post.title }}
+            {{ decodeHtmlEntities(post.title) }}
           </a>
         </h3>
       </div>

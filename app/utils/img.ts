@@ -38,10 +38,26 @@ export function getQqAvatar(qq = '', size = QqAvatarSize.Size140) {
 // https://github.com/microlinkhq/unavatar
 // https://docs.webp.se/public-services/unavatar/
 export function getFavicon(domain: string, options: Record<string, any> = {
-	provider: 'google',
+	provider: 'jiangcheng',
 	size: 32,
 }) {
-	return `https://unavatar.webp.se/${options.provider}/${domain}?s=${options.size}`
+	const { provider = 'jiangcheng', size = 32 } = options
+	
+	const services = [
+		// 方案1：自定义 favicon 服务
+		`https://api.jiangcheng.site/api/favicon?url=${domain}`,
+		
+		// 方案2：备用 favicon 服务
+		`https://favicons.fuzqing.workers.dev/api/getFavicon?url=${domain}&size=${size}`,
+	]
+	
+	// 根据 provider 选择服务
+	if (provider === 'fuzqing') {
+		return services[1]
+	}
+	
+	// 默认使用第一个服务
+	return services[0]
 }
 
 export function getImgUrl(src: string, service?: ImgService) {

@@ -67,7 +67,7 @@ export default defineEventHandler(async (event) => {
 		generator: {
 			$uri: 'https://github.com/L33Z22L11/blog-v3',
 			$version: version,
-			_: 'Zhilu Blog',
+			_: '硅基漫游指南',
 		},
 		icon: blogConfig.favicon,
 		logo: blogConfig.author.avatar, // Ratio should be 2:1

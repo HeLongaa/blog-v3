@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import blogConfig from '~~/blog.config'
+import { decodeHtmlEntities, stripHtmlAndDecode } from '~/utils/html'
 interface FriendPost {
   domain: string
   title: string
@@ -27,11 +29,6 @@ const hasMore = ref(true)
 const currentIndex = ref(0)
 const pageSize = 20
 
-// 获取头像URL
-const getAvatarUrl = (domain: string) => {
-  return `https://api.jiangcheng.site/api/favicon?url=${domain}`
-}
-
 // 格式化时间
 const formatDate = (dateStr: string) => {
   return new Date(dateStr).toLocaleDateString('zh-CN', {
@@ -43,7 +40,10 @@ const formatDate = (dateStr: string) => {
   })
 }
 
-// 更新显示的数据
+const getFavicon = (domain: string) => {
+  return `https://api.jiangcheng.site/api/favicon?url=${domain}`
+}
+
 const updateDisplayedPosts = () => {
   const endIndex = Math.min(currentIndex.value + pageSize, allPosts.value.length)
   const newPosts = allPosts.value.slice(currentIndex.value, endIndex)
@@ -61,13 +61,9 @@ const updateDisplayedPosts = () => {
   }
 }
 
-// 加载所有数据
+// 加载所有文章数据
 const loadAllPosts = async (forceRefresh = false) => {
-  if (loading.value && !initialLoading.value) return
-  
-  if (initialLoading.value) {
-    initialLoading.value = true
-  } else {
+  if (!initialLoading.value) {
     loading.value = true
   }
   
@@ -83,7 +79,7 @@ const loadAllPosts = async (forceRefresh = false) => {
       return
     }
 
-    const response = await fetch('https://blog-api.helong.online/n8n-file-data/rss_data')
+    const response = await fetch(blogConfig.data.api_endpoint + '/rss_data.json')
     if (!response.ok) throw new Error('Failed to fetch')
     
     const data = await response.json()
@@ -168,9 +164,29 @@ onMounted(() => {
 
     <div class="posts-container">
       <!-- 初始加载状态 -->
-      <div v-if="initialLoading" class="loading-container">
-        <Icon name="ph:circle-notch" class="loading-icon" />
-        <span>正在加载朋友动态...</span>
+      <div v-if="initialLoading">
+        <div class="loading-container">
+          <Icon name="ph:circle-notch" class="loading-icon" />
+          <span>正在加载朋友动态...</span>
+        </div>
+
+        <!-- 骨架屏 -->
+        <div class="skeleton-container">
+          <div v-for="i in 3" :key="i" class="skeleton-post">
+            <div class="skeleton-header">
+              <div class="skeleton-avatar"></div>
+              <div class="skeleton-info">
+                <div class="skeleton-name"></div>
+                <div class="skeleton-domain"></div>
+              </div>
+            </div>
+            <div class="skeleton-content">
+              <div class="skeleton-title"></div>
+              <div class="skeleton-text"></div>
+              <div class="skeleton-text short"></div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- 文章列表 -->
@@ -191,7 +207,7 @@ onMounted(() => {
               <div class="post-main">
                 <div class="post-header">
                   <img
-                    :src="getAvatarUrl(post.domain)"
+                    :src="getFavicon(post.domain)"
                     :alt="`${post.author} avatar`"
                     class="author-avatar"
                     loading="lazy"
@@ -199,16 +215,16 @@ onMounted(() => {
                   >
                   <div class="author-info">
                     <div class="author-details">
-                      <h3 class="author-name">{{ post.author }}</h3>
+                      <h3 class="author-name">{{ decodeHtmlEntities(post.author) }}</h3>
                       <p class="post-domain">{{ post.domain }}</p>
                     </div>
                   </div>
                 </div>
                 
                 <div class="post-content">
-                  <h2 class="post-title">{{ post.title }}</h2>
+                  <h2 class="post-title">{{ decodeHtmlEntities(post.title) }}</h2>
                   <p class="post-excerpt" v-if="post.content">
-                    {{ post.content.replace(/<[^>]*>/g, '').substring(0, 150) }}{{ post.content.length > 150 ? '...' : '' }}
+                    {{ stripHtmlAndDecode(post.content).substring(0, 150) }}{{ post.content.length > 150 ? '...' : '' }}
                   </p>
                 </div>
               </div>
@@ -295,12 +311,15 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  padding: 2rem;
+  gap: 0.75rem;
+  padding: 3rem 2rem;
   color: var(--c-text-2);
+  font-size: 1.1rem;
   
   .loading-icon {
+    font-size: 1.5rem;
     animation: spin 1s linear infinite;
+    color: var(--c-brand);
   }
 }
 
@@ -508,27 +527,47 @@ onMounted(() => {
   position: fixed;
   bottom: 2rem;
   right: 2rem;
-  width: 48px;
-  height: 48px;
-  background: var(--c-brand);
-  color: white;
-  border: none;
-  border-radius: 50%;
+  width: 42.875px;
+  height: 42.875px;
+  background: var(--c-bg-soft);
+  border: 1px solid var(--c-border);
+  color: var(--c-text-1);
+  border-radius: 12px;
   cursor: pointer;
   font-size: 1.2rem;
-  transition: all 0.3s ease;
-  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  z-index: 100;
   
   &:hover {
-    background: var(--c-brand-dark);
+    background: var(--c-brand);
+    color: var(--c-primary);
+    border-color: var(--c-brand);
     transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  }
+  
+  &:active {
+    transform: translateY(-1px);
+  }
+  
+  svg {
+    transition: transform 0.2s ease;
+  }
+  
+  &:hover svg {
+    transform: translateY(-1px);
   }
   
   @media (max-width: 768px) {
-    bottom: 1rem;
-    right: 1rem;
-    width: 44px;
-    height: 44px;
+    bottom: 8rem;
+    // right: 1.5rem;
+
+    font-size: 1.1rem;
   }
 }
 
@@ -575,6 +614,86 @@ onMounted(() => {
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+// 骨架屏样式
+.skeleton-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.skeleton-post {
+  background: var(--c-bg-soft);
+  border: 1px solid var(--c-border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.skeleton-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--c-bg-mute);
+}
+
+.skeleton-info {
+  flex: 1;
+}
+
+.skeleton-name {
+  width: 120px;
+  height: 16px;
+  background: var(--c-bg-mute);
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+}
+
+.skeleton-domain {
+  width: 80px;
+  height: 12px;
+  background: var(--c-bg-mute);
+  border-radius: 4px;
+}
+
+.skeleton-content {
+  .skeleton-title {
+    width: 90%;
+    height: 20px;
+    background: var(--c-bg-mute);
+    border-radius: 4px;
+    margin-bottom: 0.75rem;
+  }
+  
+  .skeleton-text {
+    width: 100%;
+    height: 14px;
+    background: var(--c-bg-mute);
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+    
+    &.short {
+      width: 60%;
+    }
+  }
+}
+
+@keyframes skeleton-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
   }
 }
 </style>

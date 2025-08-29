@@ -12,9 +12,9 @@ export interface FeedEntry {
 	/** 订阅源 */
 	feed?: string
 	/** 站点小图标 */
-	icon: string
+	icon?: string
 	/** 个人头像 */
-	avatar: string
+	avatar?: string
 	/** 博客技术架构 */
 	archs?: Arch[]
 	/** 订阅日期 */

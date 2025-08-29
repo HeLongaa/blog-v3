@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { myFeed } from '~~/blog.config'
-import feeds from '~/feeds'
+import getFeedGroups from '~/feeds'
 
 const appConfig = useAppConfig()
 const layoutStore = useLayoutStore()
 layoutStore.setAside([])
 
 const { data: postLink } = await useAsyncData('/link', () => queryCollection('content').path('/link').first())
+const feeds = await getFeedGroups()
+
 useSeoMeta({
 	title: '友链',
 	ogType: 'profile',

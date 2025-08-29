@@ -1,7 +1,7 @@
 import type { FeedEntry, FeedGroup } from '~/types/feed'
 import { XMLBuilder } from 'fast-xml-parser'
 import blogConfig, { myFeed } from '~~/blog.config'
-import feeds from '~/feeds'
+import getFeedGroups from '~/feeds'
 
 const runtimeConfig = useRuntimeConfig()
 
@@ -28,6 +28,7 @@ function flattenGroups(groups: FeedGroup[]) {
 }
 
 export default defineEventHandler(async (_e) => {
+	const feeds = await getFeedGroups()
 	const outlines = [
 		mapEntry(myFeed),
 		...flattenGroups(feeds),

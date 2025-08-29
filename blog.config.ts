@@ -13,7 +13,7 @@ const blogConfig = {
 	description: '硅基漫游指南，分享技术与生活。这个博客记录了在生活和技术学习中的点滴经历，网站界面简洁美观，内容丰富实用，人气互动活跃，涵盖了编程、生活、学习等多个领域。',
 	author: {
 		name: 'HeLongaa',
-		avatar: 'https://avatars.githubusercontent.com/u/71657914?v=4',
+		avatar: 'https://oss.helong.online/bucket-IMG/bea2394fef15b88de49ae37707b3c1b86d7dbc2035a752ef2581a8b6cb3b2e8c.png',
 		email: 'helong_001@qq.com',
 		homepage: 'https://helong.online',
 	},
@@ -22,7 +22,7 @@ const blogConfig = {
 		name: '署名-非商业性使用-相同方式共享 4.0 国际',
 		url: 'https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hans',
 	},
-	favicon: 'https://www.zhilu.site/api/icon.png',
+	favicon: 'https://oss.helong.online/bucket-IMG/bea2394fef15b88de49ae37707b3c1b86d7dbc2035a752ef2581a8b6cb3b2e8c.png',
 	language: 'zh-CN',
 	timeEstablished: '2025-07-19',
 	timezone: 'Asia/Shanghai',
@@ -56,6 +56,10 @@ const blogConfig = {
 		server: 'https://artalk.helong.online',
 		site: 'Local',
 	},
+
+	data:{
+		api_endpoint: 'https://api-blog.helong.online'
+	},
 }
 
 // 用于生成 OPML 和友链页面配置
@@ -68,7 +72,7 @@ export const myFeed = <FeedEntry>{
 	feed: new URL('/atom.xml', blogConfig.url).toString(),
 	icon: blogConfig.favicon,
 	avatar: blogConfig.author.avatar,
-	archs: ['Nuxt', 'Vercel'],
+	archs: ['Nuxt', 'EdgeOne'],
 	date: blogConfig.timeEstablished,
 	comment: '这是我自己',
 }
@@ -87,7 +91,6 @@ export const routeRules = <NitroConfig['routeRules']>{
 	...redirectRouteRules,
 	'/api/stats': { prerender: true, headers: { 'Content-Type': 'application/json' } },
 	'/atom.xml': { prerender: true, headers: { 'Content-Type': 'application/xml' } },
-	'/favicon.ico': { redirect: { to: blogConfig.favicon } },
 	'/zhilu.opml': { prerender: true, headers: { 'Content-Type': 'application/xml' } },
 }
 

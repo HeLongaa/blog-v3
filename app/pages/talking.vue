@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { decodeHtmlEntities } from '~/utils/html'
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 
 const appConfig = useAppConfig()
@@ -158,6 +159,17 @@ function handleScroll() {
   }
 }
 
+// 返回顶部相关
+const { y: scrollY } = useScroll(window)
+const showBackToTop = computed(() => scrollY.value > 300)
+
+const scrollToTop = () => {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  })
+}
+
 // 滚动到评论区
 function scrollToComment(content: string) {
   const commentSection = document.getElementById('comment-section')
@@ -196,7 +208,33 @@ onUnmounted(() => {
     </div>
 
     <div class="moments-list">
-      <div v-for="(moment, groupIndex) in displayedMoments" :key="`${groupIndex}-${moment.name}`" class="moment-group">
+      <!-- 初始加载状态 -->
+      <div v-if="initialLoading">
+        <div class="loading-container">
+          <Icon name="ph:circle-notch" class="loading-icon" />
+          <span>正在加载瞬间...</span>
+        </div>
+        
+        <!-- 骨架屏 -->
+        <div class="skeleton-container">
+          <div v-for="i in 3" :key="i" class="skeleton-moment">
+            <div class="skeleton-header">
+              <div class="skeleton-avatar"></div>
+              <div class="skeleton-info">
+                <div class="skeleton-name"></div>
+                <div class="skeleton-date"></div>
+              </div>
+            </div>
+            <div class="skeleton-content">
+              <div class="skeleton-text"></div>
+              <div class="skeleton-text short"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 动态列表 -->
+      <div v-else v-for="(moment, groupIndex) in displayedMoments" :key="`${groupIndex}-${moment.name}`" class="moment-group">
         <div 
           v-for="(item, index) in moment.moment_list" 
           :key="`${groupIndex}-${index}`" 
@@ -224,7 +262,7 @@ onUnmounted(() => {
           </div>
 
           <div class="moment-content">
-            <p class="content-text">{{ item.content }}</p>
+            <p class="content-text">{{ decodeHtmlEntities(item.content) }}</p>
             <div v-if="item.image && item.image.length > 0" class="image-grid">
               <a
                 v-for="(img, imgIndex) in item.image"
@@ -277,6 +315,18 @@ onUnmounted(() => {
     <div id="comment-section">
       <PostComment />
     </div>
+
+    <!-- 返回顶部 -->
+    <Transition name="fade">
+      <button
+        v-if="showBackToTop"
+        @click="scrollToTop"
+        class="back-to-top"
+        aria-label="返回顶部"
+      >
+        <Icon name="ph:arrow-up-bold" />
+      </button>
+    </Transition>
   </div>
 </template>
 
@@ -607,5 +657,155 @@ onUnmounted(() => {
   to {
     transform: rotate(360deg);
   }
+}
+
+// 加载样式
+.loading-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 3rem 2rem;
+  color: var(--c-text-2);
+  font-size: 1.1rem;
+  
+  .loading-icon {
+    font-size: 1.5rem;
+    animation: spin 1s linear infinite;
+    color: var(--c-brand);
+  }
+}
+
+// 骨架屏样式
+.skeleton-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.skeleton-moment {
+  background: var(--c-bg-soft);
+  border: 1px solid var(--c-border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.skeleton-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--c-bg-mute);
+}
+
+.skeleton-info {
+  flex: 1;
+}
+
+.skeleton-name {
+  width: 100px;
+  height: 16px;
+  background: var(--c-bg-mute);
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+}
+
+.skeleton-date {
+  width: 60px;
+  height: 12px;
+  background: var(--c-bg-mute);
+  border-radius: 4px;
+}
+
+.skeleton-content {
+  .skeleton-text {
+    width: 100%;
+    height: 14px;
+    background: var(--c-bg-mute);
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+    
+    &.short {
+      width: 70%;
+    }
+  }
+}
+
+@keyframes skeleton-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+// 返回顶部按钮
+.back-to-top {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 52px;
+  height: 52px;
+  background: var(--c-bg-soft);
+  border: 1px solid var(--c-border);
+  color: var(--c-text-1);
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  z-index: 100;
+  
+  &:hover {
+    background: var(--c-brand);
+    color: white;
+    border-color: var(--c-brand);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  }
+  
+  &:active {
+    transform: translateY(-1px);
+  }
+  
+  svg {
+    transition: transform 0.2s ease;
+  }
+  
+  &:hover svg {
+    transform: translateY(-1px);
+  }
+  
+  @media (max-width: 768px) {
+    bottom: 1.5rem;
+    right: 1.5rem;
+    width: 48px;
+    height: 48px;
+    font-size: 1.1rem;
+  }
+}
+
+// 过渡动画
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

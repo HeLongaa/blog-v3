@@ -11,11 +11,13 @@ export default defineAppConfig({
 
 	article: {
 		categories: <{ [category: string]: { icon: string, color?: string } }>{
-			经验分享: { icon: 'ph:mouse-bold', color: '#3af' },
 			杂谈: { icon: 'ph:chat-bold', color: '#3ba' },
 			生活: { icon: 'ph:shooting-star-bold', color: '#f77' },
-			代码: { icon: 'ph:code-bold', color: '#77f' },
 			未分类: { icon: 'ph:folder-dotted-bold' },
+			云服务:{icon: 'mdi:cloud-outline',color: '#3af'},
+			开发运维:{icon: 'simple-icons:devbox',color: '#77f'},
+			工具:{icon: 'mynaui:tool',color: '#02941fff'},
+			项目:{icon: 'codicon:github',color: '#039e8fff'},
 		},
 		defaultCategoryIcon: 'ph:folder-bold',
 		/** 分类排序方式，键为排序字段，值为显示名称 */
@@ -80,11 +82,11 @@ export default defineAppConfig({
 
 	/** 左侧栏顶部 Logo */
 	header: {
-		logo: 'https://weavatar.com/avatar/47c0f2e82b76d9b10eb3023df9e02e4e3fdbeaf5b74b842063f207971e7fbe7b?s=160',
+		logo: 'https://oss.helong.online/bucket-IMG/bea2394fef15b88de49ae37707b3c1b86d7dbc2035a752ef2581a8b6cb3b2e8c.png',
 		/** 展示标题文本，否则展示纯 Logo */
 		showTitle: true,
 		subtitle: blogConfig.subtitle,
-		emojiTail: ['📄', '🦌', '🙌', '🐟', '🏖️'],
+		emojiTail: ['', '🦌', '🙌', '🐟', '🏖️'],
 	},
 
 	/** 左侧栏导航 */
@@ -93,9 +95,10 @@ export default defineAppConfig({
 			title: '',
 			items: [
 				{ icon: 'ph:files-bold', text: '文章', url: '/' },
-				{ icon: 'ph:users-bold', text: '朋友动态', url: '/friends' },
 				{ icon: 'ph:lightning-bold', text: '瞬间', url: '/talking' },
 				{ icon: 'ph:link-bold', text: '友链', url: '/link' },
+				{ icon: 'ph:users-bold', text: '朋友动态', url: '/friends' },
+				{ icon: 'ph:user-bold', text: '关于', url: '/about' },
 				{ icon: 'ph:archive-bold', text: '归档', url: '/archive' },
 			],
 		},
