@@ -3,7 +3,7 @@ import { getFavicon, getGhAvatar, getGhIcon, getQqAvatar, QqAvatarSize } from '.
 
 export default [
 	{
-		name: '相谈甚多',
+		name: '',
 		desc: '',
 		// @keep-sorted { "keys": ["date"] }
 		entries: [

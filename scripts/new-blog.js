@@ -2,6 +2,7 @@ import { exec } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
+import crypto from 'node:crypto'
 
 // 获取当前路径和参数
 const args = process.argv.slice(2)
@@ -12,16 +13,18 @@ if (!blogTitle) {
 	process.exit(1)
 }
 
-// 获取当前年份
-const year = new Date().getFullYear()
-const directory = path.join(process.cwd(), 'content', 'article', year.toString())
+// 生成文章ID
+const articleID = crypto.createHash('sha256').update(Date.now().toString()).digest('hex').slice(0, 16)
+
+// 文章目录
+const directory = path.join(process.cwd(), 'content', 'article')
 
 // 确保目录存在
 if (!fs.existsSync(directory)) {
 	fs.mkdirSync(directory, { recursive: true })
 }
 
-const filePath = path.join(directory, `${blogTitle}.md`)
+const filePath = path.join(directory, `${articleID}.md`)
 
 if (fs.existsSync(filePath)) {
 	console.error('文件已存在')

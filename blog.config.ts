@@ -26,7 +26,7 @@ const blogConfig = {
 	language: 'zh-CN',
 	timeEstablished: '2019-07-19',
 	timezone: 'Asia/Shanghai',
-	url: 'https://blog.zhilu.site/',
+	url: 'https://blog.helong.online',
 
 	defaultCategory: ['未分类'],
 
