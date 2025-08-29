@@ -24,7 +24,7 @@ const blogConfig = {
 	},
 	favicon: 'https://www.zhilu.site/api/icon.png',
 	language: 'zh-CN',
-	timeEstablished: '2019-07-19',
+	timeEstablished: '2025-07-19',
 	timezone: 'Asia/Shanghai',
 	url: 'https://blog.helong.online',
 

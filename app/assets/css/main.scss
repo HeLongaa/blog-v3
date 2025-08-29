@@ -16,6 +16,7 @@
 	scroll-behavior: smooth;
 	scroll-padding: 2rem;
 	scrollbar-color: var(--c-text-3) transparent;
+	scrollbar-gutter: stable;
 	-webkit-tap-highlight-color: var(--c-primary-soft);
 
 	@media (max-resolution: 1.4dppx) {

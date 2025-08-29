@@ -23,7 +23,8 @@ const [pm, pmVersion] = packageManager.split('@') as [string, string]
 
 const service = computed(() => ([
 	...ci ? [{ label: '构建平台', value: ciPlatform }] : [],
-	{ label: '图片存储', value: () => [h('img', { src: 'https://7.isyangs.cn/1/6553112f89de6-1.png', alt: '' }), ' 去图图床'] },
+	{ label: '构建平台', value: () => [h('img', { src: 'https://oss.helong.online/bucket-IMG/52754e89efec692832330c6f970b4da0159df58687df6c67d90fc3a73a23a87c.png', alt: '' }), ''] },
+	{ label: '图片存储', value: () => [h('img', { src: 'https://oss.helong.online/bucket-IMG/f04db44f39d843cd60a69504c2b278758798e08678887ae12aacd4a507085132.png', alt: '' }), '  Object Storage'] },
 	{ label: '软件协议', value: 'MIT' },
 	{ label: '文章许可', value: appConfig.copyright.abbr },
 	{ label: '规范域名', value: getDomain(appConfig.url) },

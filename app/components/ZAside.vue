@@ -10,14 +10,12 @@ const { widgets } = useWidgets(() => layoutStore.asideWidgets)
 </Transition>
 <!-- 此处不能使用 Transition，因为宽屏状态始终显示 -->
 <!-- 如果为空数组则隐藏 -->
-<Transition>
-	<aside v-if="layoutStore.asideWidgets?.length" id="z-aside" :class="{ show: layoutStore.isOpen('aside') }">
-		<TransitionGroup name="float-in">
-			<!-- 更换页面时相同 key 的组件不会更新 -->
-			<component :is="widget.comp" v-for="widget in widgets" :key="widget.name" />
-		</TransitionGroup>
-	</aside>
-</Transition>
+<aside v-if="layoutStore.asideWidgets?.length" id="z-aside" :class="{ show: layoutStore.isOpen('aside') }">
+	<TransitionGroup name="float-in">
+		<!-- 更换页面时相同 key 的组件不会更新 -->
+		<component :is="widget.comp" v-for="widget in widgets" :key="widget.name" />
+	</TransitionGroup>
+</aside>
 </template>
 
 <style lang="scss" scoped>
