@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import blogConfig from '~~/blog.config'
 import { decodeHtmlEntities } from '~/utils/html'
+import { getFavicon, getGhAvatar, getGhIcon, getQqAvatar, QqAvatarSize } from '../../utils/img'
 
 interface FriendPost {
   domain: string
@@ -15,22 +16,9 @@ const dataCacheStore = useDataCacheStore()
 const posts = ref<FriendPost[]>([])
 const loading = ref(true)
 
-// 获取头像URL
-const getAvatarUrl = (domain: string) => {
-  return `https://api.jiangcheng.site/api/favicon?url=${domain}`
-}
-
-// 格式化相对时间
-const formatRelativeTime = (dateStr: string) => {
-  const now = new Date()
+// 格式化日期为月日格式
+const formatDate = (dateStr: string) => {
   const date = new Date(dateStr)
-  const diffMs = now.getTime() - date.getTime()
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
-  
-  if (diffDays === 0) return '今天'
-  if (diffDays === 1) return '昨天'
-  if (diffDays < 7) return `${diffDays}天前`
-  if (diffDays < 30) return `${Math.floor(diffDays / 7)}周前`
   return date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })
 }
 
@@ -90,7 +78,7 @@ onMounted(() => {
     >
       <div class="post-header">
         <img 
-          :src="getAvatarUrl(post.domain)" 
+          :src="getFavicon(post.domain)" 
           :alt="`${post.author}的头像`"
           class="avatar"
           loading="lazy"
@@ -98,7 +86,7 @@ onMounted(() => {
         >
         <div class="post-meta">
           <div class="author">{{ decodeHtmlEntities(post.author) }}</div>
-          <div class="time">{{ formatRelativeTime(post.date) }}</div>
+          <div class="time">{{ formatDate(post.date) }}</div>
         </div>
       </div>
       

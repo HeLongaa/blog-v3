@@ -100,6 +100,7 @@ export default defineAppConfig({
 				{ icon: 'ph:users-bold', text: '朋友动态', url: '/friends' },
 				{ icon: 'ph:user-bold', text: '关于', url: '/about' },
 				{ icon: 'ph:archive-bold', text: '归档', url: '/archive' },
+				{ icon: 'ph:chat-circle-dots-bold', text: '留言板', url: '/messages' },
 			],
 		},
 	] satisfies Nav,

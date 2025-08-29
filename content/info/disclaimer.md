@@ -59,7 +59,7 @@ categories: [信息]
 ---
 icon: https://oss.helong.online/bucket-IMG/bea2394fef15b88de49ae37707b3c1b86d7dbc2035a752ef2581a8b6cb3b2e8c.png
 title: 留言板
-link: "/massages"
+link: "/messages"
 ---
 ::
 
