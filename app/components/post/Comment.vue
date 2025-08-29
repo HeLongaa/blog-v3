@@ -1,12 +1,36 @@
 <script setup lang="ts">
 const appConfig = useAppConfig()
+const route = useRoute()
 
 onMounted(() => {
-	// @ts-expect-error windows上有twikoo实例
-	window.twikoo?.init?.({
-		envId: appConfig.twikoo?.envId,
-		// twikoo 会把挂载后的元素变为 #twikoo
-		el: '#twikoo',
+	// 确保DOM完全加载后再初始化Artalk
+	nextTick(() => {
+		const initArtalk = () => {
+			const artalkEl = document.getElementById('artalk')
+			// @ts-expect-error window上有Artalk实例
+			if (artalkEl && window.Artalk) {
+				try {
+					// @ts-expect-error Artalk类型
+					window.Artalk.init({
+						el: '#artalk',
+						pageKey: route.path,
+						pageTitle: document.title.replace(` | ${appConfig.title}`, ''),
+						server: appConfig.artalk?.server,
+						site: appConfig.artalk?.site,
+					})
+				} catch (error) {
+					console.error('Artalk初始化失败:', error)
+				}
+			} else if (!artalkEl) {
+				console.error('未找到#artalk元素')
+			} else {
+				// 如果元素存在但Artalk还没加载，等待一下再重试
+				setTimeout(initArtalk, 200)
+			}
+		}
+		
+		// 延迟一点时间确保DOM完全渲染
+		setTimeout(initArtalk, 100)
 	})
 })
 </script>
@@ -16,7 +40,7 @@ onMounted(() => {
 	<h3 class="text-creative">
 		评论区
 	</h3>
-	<div id="twikoo">
+	<div id="artalk">
 		<p>评论加载中...</p>
 	</div>
 </section>
@@ -32,27 +56,22 @@ onMounted(() => {
 	}
 }
 
-:deep(#twikoo) {
+:deep(#artalk) {
 	margin: 2em 0;
 
-	.tk-admin-container {
-		position: fixed;
-		z-index: 1;
+	.atk-main {
+		font-family: inherit;
 	}
 
-	.tk-input {
+	.atk-input {
 		font-family: var(--font-monospace);
 	}
 
-	.tk-time {
+	.atk-time {
 		color: var(--c-text-3);
 	}
 
-	.tk-main {
-		margin-top: -0.1rem;
-	}
-
-	.tk-content {
+	.atk-content {
 		margin-top: 0.1rem;
 
 		img {
@@ -60,8 +79,9 @@ onMounted(() => {
 		}
 	}
 
-	.tk-comments-title, .tk-nick > strong {
+	.atk-nick {
 		font-family: var(--font-creative);
+		font-weight: bold;
 	}
 
 	pre {
@@ -101,22 +121,18 @@ onMounted(() => {
 		}
 	}
 
-	.tk-owo-emotion {
+	.atk-emotion {
 		width: auto;
 		height: 1.4em;
 		vertical-align: text-bottom;
 	}
 
-	.tk-extras, .tk-footer {
+	.atk-footer {
 		font-size: 0.7rem;
 		color: var(--c-text-3);
 	}
 
-	.tk-replies:not(.tk-replies-expand) {
-		mask-image: linear-gradient(#FFF 50%, transparent);
-	}
-
-	.tk-expand {
+	.atk-list-wrap {
 		border-radius: 0.5rem;
 		transition: background-color 0.1s;
 	}

@@ -28,7 +28,7 @@ function renderContent(post: ContentCollectionItem) {
 
 export default defineEventHandler(async (event) => {
 	const posts = await queryCollection(event, 'content')
-		.where('stem', 'LIKE', 'posts/%')
+		.where('stem', 'LIKE', 'article/%')
 		.order('updated', 'DESC')
 		.limit(blogConfig.feed.limit)
 		.all()
@@ -37,7 +37,7 @@ export default defineEventHandler(async (event) => {
 		id: getUrl(post.path),
 		title: post.title ?? '',
 		updated: getIsoDatetime(post.updated),
-		author: { name: post.author || blogConfig.author.name },
+		author: { name: blogConfig.author.name },
 		content: {
 			$type: 'html',
 			$: renderContent(post),
@@ -45,7 +45,7 @@ export default defineEventHandler(async (event) => {
 		link: { $href: getUrl(post.path) },
 		summary: post.description,
 		category: { $term: post.categories?.[0] },
-		published: getIsoDatetime(post.published) ?? getIsoDatetime(post.date),
+		published: getIsoDatetime(post.date),
 	}))
 
 	const feed = {

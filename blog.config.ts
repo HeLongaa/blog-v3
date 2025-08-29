@@ -35,7 +35,7 @@ const blogConfig = {
 	},
 
 	// 在 URL 中隐藏的路径前缀
-	hideContentPrefixes: ['/posts'],
+	hideContentPrefixes: ['/article'],
 
 	imageDomains: [
 		// 自动启用本域名的 Nuxt Image
@@ -47,14 +47,14 @@ const blogConfig = {
 	robotsNotIndex: ['/preview', '/previews/*'],
 
 	scripts: [
-		// Twikoo 评论系统
-		{ src: 'https://lib.baomitu.com/twikoo/1.6.44/twikoo.min.js', defer: true },
+		// Artalk 评论系统
+		{ src: 'https://artalk.helong.online/dist/Artalk.js', defer: true },
 	],
 
-	// 自己部署的 Twikoo 服务
-	twikoo: {
-		envId: 'https://twikoo.zhilu.cyou/',
-		preload: 'https://twikoo.zhilu.cyou/',
+	// 自己部署的 Artalk 服务
+	artalk: {
+		server: 'https://artalk.helong.online',
+		site: 'Local',
 	},
 }
 

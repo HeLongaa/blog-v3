@@ -2,7 +2,7 @@ import type ArticleProps from '~/types/article'
 import type { ArticleOrderType } from '~/types/article'
 import { alphabetical } from 'radash'
 
-export function useArticleIndex(path = 'posts/%') {
+export function useArticleIndex(path = 'article/%') {
 	return useAsyncData(
 		`index_${path}`,
 		() => queryCollection('content')

@@ -29,7 +29,7 @@ function hasActiveChild(entry: TocLink, activeId: string | null): boolean {
 		<a href="#main-content" aria-label="返回开头">
 			<Icon name="ph:arrow-circle-up-bold" />
 		</a>
-		<a href="#twikoo" aria-label="评论区">
+		<a href="#artalk" aria-label="评论区">
 			<Icon name="ph:chat-circle-text-bold" />
 		</a>
 	</template>
