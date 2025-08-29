@@ -40,6 +40,8 @@ export default defineNuxtConfig({
       ...routeRules,
       // 确保静态资源不被优化处理
       '/assets/**': { headers: { 'Cache-Control': 'max-age=31536000' } },
+      // 跳过IPX图像处理以避免URI错误
+      '/_ipx/**': { prerender: false }
     }
   },
 	compatibilityDate: '2024-08-03',
@@ -150,23 +152,17 @@ ${packageJson.homepage}
 	},
 
 	image: {
-		// 恢复图像处理功能，但添加错误处理
-		provider: process.env.NUXT_IMAGE_PROVIDER || 'ipx',
+		// 只在运行时处理图像，避免预渲染时的URI错误
+		provider: process.env.NODE_ENV === 'development' ? 'ipx' : 'ipx',
 		domains: blogConfig.imageDomains,
-		format: ['avif', 'webp'],
-		// 在构建时跳过外部图像预处理以避免URI错误
-		presets: process.env.NODE_ENV === 'production' ? {
-			default: {
-				modifiers: {
-					quality: 80,
-					format: 'webp'
-				}
-			}
-		} : {},
-		// IPX配置选项
+		format: ['webp'],
+		quality: 80,
+		// 配置IPX选项
 		ipx: {
-			// 禁用预处理外部URL以避免URI错误
-			disableURLEncoding: true,
+			modifiers: {
+				format: 'webp',
+				quality: 80
+			}
 		}
 	},
 
