@@ -38,7 +38,7 @@ useEventListener('keydown', (event) => {
 	right: min(2rem, 5%);
 	bottom: min(2rem, 5%);
 	border-radius: 0.5rem;
-	background-color: var(--c-bg-a50);
+	background-color: var(--c-bg-soft);
 	backdrop-filter: blur(0.5rem);
 	font-size: 1.4rem;
 	z-index: 100;
@@ -70,9 +70,10 @@ button {
 	transition: all 0.2s;
 
 	&:hover {
-		background-color: var(--c-bg-a80);
-		color: var(--c-primary);
-	}
+    background-color: var(--c-primary);
+    color: var(--c-bg);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  }
 
 	&.active {
 		background-color: var(--ld-bg-active);

@@ -14,16 +14,16 @@ function scrollToTop() {
 </script>
 
 <template>
-	<Transition name="fade">
-		<button
-			v-if="showBackToTop"
-			class="back-to-top"
-			aria-label="返回顶部"
-			@click="scrollToTop"
-		>
-			<Icon name="ph:arrow-up-bold" />
-		</button>
-	</Transition>
+<Transition name="fade">
+	<button
+		v-if="showBackToTop"
+		class="back-to-top"
+		aria-label="返回顶部"
+		@click="scrollToTop"
+	>
+		<Icon name="ph:arrow-up-bold" />
+	</button>
+</Transition>
 </template>
 
 <style lang="scss" scoped>
@@ -32,26 +32,33 @@ function scrollToTop() {
 	bottom: 8rem;
 	right: min(2rem, 5%);
 	padding: 0.5rem;
-	background-color: var(--c-bg-a50);
+	background-color: var(--c-bg-soft);
 	backdrop-filter: blur(0.5rem);
-	border: none;
+	border: 1px solid var(--c-border-light);
 	border-radius: 0.5rem;
 	cursor: pointer;
 	font-size: 1.4rem;
 	display: block;
 	transition: all 0.2s;
-	z-index: 100;
+	z-index: 90;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 
 	&:hover {
-		background-color: var(--c-bg-a80);
-		color: var(--c-primary);
+		background-color: var(--c-primary);
+		color: var(--c-bg);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 	}
 
 	@media (max-width: 768px) {
 		bottom: 8rem;
-		font-size: 1.4rem;
 	}
-}
+  @media (max-width: 1080px) and (min-width: 769px) {
+    bottom: 5.5rem;
+  }
+  @media (min-width: 1081px) {
+    bottom: 3rem;
+  }
+  }
 
 .fade-enter-active,
 .fade-leave-active {
