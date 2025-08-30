@@ -120,6 +120,12 @@ export default defineNuxtConfig({
 				toc: { depth: 4, searchDepth: 4 },
 			},
 		},
+		markdown: {
+			mdc: true,
+		},
+		experimental: {
+			clientDB: true,
+		},
 	},
 
 	hooks: {

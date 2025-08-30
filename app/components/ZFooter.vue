@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import blogConfig from '~~/blog.config'
+
 const appConfig = useAppConfig()
 </script>
 
@@ -21,17 +23,19 @@ const appConfig = useAppConfig()
 	</nav>
 	<div class="footer-bottom">
 		<p>
-			本站由 HeLong 使用<ProseA href="https://github.com/HeLongaa/blog-v3">
-      纸鹿的开源博客
-			</ProseA> 主题创建。
+			本站由 {{ blogConfig.author.name }} 使用 <ProseA href="https://github.com/HeLongaa/blog-v3">
+				纸鹿的开源博客
+			</ProseA>主题创建。
 		</p>
 		<p>
-			本博客所有文章除特别声明外，均采用    <ProseA :href="appConfig.copyright.url">
+			本博客所有文章除特别声明外，均采用<ProseA :href="appConfig.copyright.url">
 				CC BY-NC-SA 4.0
-			</ProseA>    许可协议。
+			</ProseA>许可协议。
 		</p>
 		<p>
-			完整转载请注明来自 <Badge link="https://blog.helong.online">硅基漫游指南</Badge>
+			完整转载请注明来自 <ProseA href="https://blog.helong.online">
+				硅基漫游指南
+			</ProseA>
 		</p>
 	</div>
 </footer>

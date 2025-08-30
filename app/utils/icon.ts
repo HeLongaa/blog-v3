@@ -64,6 +64,7 @@ const mainDomainIcons: Record<string, string> = {
 	'vercel.app': 'simple-icons:vercel',
 	'zabaur.app': 'tabler:square-letter-z-filled',
 	'zhihu.com': 'ri:zhihu-line',
+	'helong.online': 'la:blog',
 }
 
 /** 专门域名图标映射，优先级高于主域名图标 */

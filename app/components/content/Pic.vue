@@ -3,12 +3,14 @@ import { LazyPopoverLightbox } from '#components'
 
 const props = withDefaults(defineProps<{
 	src: string
+	alt?: string
 	mirror?: ImgService
 	caption?: string
 	width?: string | number
 	height?: string | number
 	zoom?: boolean
 }>(), {
+	alt: '',
 	caption: '',
 	zoom: true,
 })
@@ -31,7 +33,11 @@ const { open } = popoverStore.use(() => h(LazyPopoverLightbox, {
 		ref="pic"
 		class="image"
 		:style="{ cursor: zoom && 'zoom-in' }"
-		:src :alt="caption" :width :height :mirror
+		:src="src"
+		:alt="alt || caption"
+		:width="width"
+		:height="height"
+		:mirror="mirror"
 		@click="zoom && open()"
 	/>
 	<figcaption v-if="caption" aria-hidden v-text="caption" />

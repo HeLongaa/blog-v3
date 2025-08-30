@@ -7,45 +7,46 @@ const colorMode = useColorMode()
 
 const artalkManager = ArtalkManager.getInstance()
 
-const initArtalk = async () => {
-  try {
-    await artalkManager.init({
-      el: '#artalk',
-      pageKey: route.path,
-      pageTitle: document.title.replace(` | ${appConfig.title}`, ''),
-      server: appConfig.artalk?.server,
-      site: appConfig.artalk?.site,
-      emoticons: "/assets/Owo-Artalk.json",
-      darkMode: colorMode.value === 'dark'
-    })
-  } catch (error) {
-    console.error('评论系统初始化失败:', error)
-  }
+async function initArtalk() {
+	try {
+		await artalkManager.init({
+			el: '#artalk',
+			pageKey: route.path,
+			pageTitle: document.title.replace(` | ${appConfig.title}`, ''),
+			server: appConfig.artalk?.server,
+			site: appConfig.artalk?.site,
+			emoticons: '/assets/Owo-Artalk.json',
+			darkMode: colorMode.value === 'dark',
+		})
+	}
+	catch (error) {
+		console.error('评论系统初始化失败:', error)
+	}
 }
 
 onMounted(() => {
-  // 确保DOM完全加载后再初始化Artalk
-  nextTick(() => {
-    setTimeout(initArtalk, 100)
-  })
+	// 确保DOM完全加载后再初始化Artalk
+	nextTick(() => {
+		setTimeout(initArtalk, 100)
+	})
 })
 
 // 路由变化时重新初始化
 watch(() => route.path, () => {
-  nextTick(() => {
-    setTimeout(initArtalk, 100)
-  })
+	nextTick(() => {
+		setTimeout(initArtalk, 100)
+	})
 })
 
 // 监听主题变化
 watch(() => colorMode.value, (newMode) => {
-  artalkManager.setDarkMode(newMode === 'dark')
+	artalkManager.setDarkMode(newMode === 'dark')
 })
 
 // 组件卸载时清理
 onUnmounted(() => {
-  // 注意：这里不要清理全局实例，因为其他页面可能还在使用
-  // artalkManager.destroy()
+	// 注意：这里不要清理全局实例，因为其他页面可能还在使用
+	// artalkManager.destroy()
 })
 </script>
 
@@ -72,13 +73,17 @@ onUnmounted(() => {
 
 :deep(#artalk) {
 	margin-top: 1rem;
-	font-family: var(--font-monospace);
+	//font-family: var(--font-basic);
 
 	/* 自定义 Artalk 评论样式 */
 	.atk-main-editor {
-		border-radius: 8px !important;
+		border-radius: 1rem !important;
+    background-color: var(--ld-bg-card);
 	}
-	
+  .atk-textarea{
+    background-color: var(--ld-bg-card);
+  }
+
 	.atk-send-btn {
 		background-color: var(--c-primary) !important;
 		border-radius: 16px !important;
@@ -88,12 +93,12 @@ onUnmounted(() => {
 	.atk-comment-wrap {
 		margin: 16px 0;
 		background-color: var(--ld-bg-card);;
-		border-radius: 8px;
+		border-radius: 1rem;
 	}
-	
+
 	/* 评论内部padding */
 	.atk-comment-wrap .atk-comment {
-		padding: 20px 20px 20px 20px;
+		padding: 10px;
 	}
 
 	/* 子评论样式调整 */
@@ -109,21 +114,17 @@ onUnmounted(() => {
 	}
 
 	.atk-nick a {
-		font-size: 16px !important;
+		font-size: 0.9rem !important;
 		color: var(--c-brand) !important;
 	}
-	
+
 	.atk-reply-at > .atk-nick {
-		font-size: 14px !important;
+		font-size: 0.8rem !important;
 		color: var(--c-brand) !important;
 	}
 
 	.atk-comment > .atk-main > .atk-header {
 		padding-top: 5px;
-	}
-
-	.atk-content {
-		line-height: 1.6;
 	}
 
 	/* 优化评论头部布局 */
@@ -147,7 +148,7 @@ onUnmounted(() => {
 		cursor: pointer;
 		opacity: 0.8;
 		transition: opacity 0.2s;
-		
+
 		&:hover {
 			opacity: 1;
 		}
@@ -157,16 +158,16 @@ onUnmounted(() => {
 		list-style: none !important;
 		margin: 0 !important;
 		padding: 0 !important;
-		
+
 		.atk-dropdown-item {
 			list-style: none !important;
 			margin: 0 !important;
 			padding: 8px 12px !important;
-			
+
 			&::marker {
 				display: none !important;
 			}
-			
+
 			&::before {
 				display: none !important;
 			}
@@ -178,7 +179,7 @@ onUnmounted(() => {
 		.atk-comment-wrap {
 			margin: 12px 0;
 		}
-		
+
 		.atk-comment-wrap .atk-comment {
 			padding: 12px;
 		}
@@ -189,29 +190,30 @@ onUnmounted(() => {
 		.atk-comment-wrap {
 			background-color: var(--c-bg-2);
 		}
-		
+
 		.atk-main-editor {
 			background-color: var(--c-bg-2) !important;
 			border-color: var(--c-border) !important;
 			color: var(--c-text-1) !important;
 		}
-		
+
 		.atk-send-btn {
 			background-color: var(--c-brand) !important;
-			
+
 			&:hover {
 				background-color: var(--c-brand-light) !important;
 			}
 		}
-		
-		.atk-content {
+
+		.atk-content p {
 			color: var(--c-text-1) !important;
+      font-size: 0.9rem !important;
 		}
-		
+
 		.atk-nick a {
 			color: var(--c-brand-light) !important;
 		}
-		
+
 		.atk-reply-at > .atk-nick {
 			color: var(--c-brand-light) !important;
 		}
