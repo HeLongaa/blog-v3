@@ -131,20 +131,10 @@ function loadMore() {
 }
 
 // 滚动加载
+// eslint-disable-next-line unused-imports/no-unused-vars
 const { arrivedState, y: scrollY } = useScroll(window, {
 	offset: { bottom: 100 },
 })
-
-// 显示返回顶部按钮
-const showBackToTop = computed(() => scrollY.value > 300)
-
-// 返回顶部
-function scrollToTop() {
-	window.scrollTo({
-		top: 0,
-		behavior: 'smooth',
-	})
-}
 
 watch(() => arrivedState.bottom, (isBottom) => {
 	if (isBottom) {
@@ -274,16 +264,6 @@ onMounted(() => {
 	</div>
 
 	<!-- 返回顶部 -->
-	<Transition name="fade">
-		<button
-			v-if="showBackToTop"
-			class="back-to-top"
-			aria-label="返回顶部"
-			@click="scrollToTop"
-		>
-			<Icon name="ph:arrow-up-bold" />
-		</button>
-	</Transition>
 </div>
 </template>
 
@@ -537,55 +517,6 @@ onMounted(() => {
     transform: translateY(0);
   }
 }
-
-.back-to-top {
-  position: fixed;
-  bottom: 2rem;
-  right: 2rem;
-  width: 42.875px;
-  height: 42.875px;
-  background: var(--c-bg-soft);
-  border: 1px solid var(--c-border);
-  color: var(--c-text-1);
-  border-radius: 12px;
-  cursor: pointer;
-  font-size: 1.2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  backdrop-filter: blur(8px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  z-index: 100;
-
-  &:hover {
-    background: var(--c-brand);
-    color: var(--c-primary);
-    border-color: var(--c-brand);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-  }
-
-  &:active {
-    transform: translateY(-1px);
-  }
-
-  svg {
-    transition: transform 0.2s ease;
-  }
-
-  &:hover svg {
-    transform: translateY(-1px);
-  }
-
-  @media (max-width: 768px) {
-    bottom: 8rem;
-    // right: 1.5rem;
-
-    font-size: 1.1rem;
-  }
-}
-
 // 动画
 .post-enter-active,
 .post-leave-active {

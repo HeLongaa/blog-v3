@@ -11,6 +11,7 @@
 </div>
 <ZPanel />
 <ZPopover />
+<BackToTop />
 </template>
 
 <!-- eslint-disable-next-line vue/enforce-style-attribute -->

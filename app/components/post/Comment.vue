@@ -268,7 +268,7 @@ onUnmounted(() => {
 
 	blockquote {
 		margin: 0.5em 0;
-		padding: 0.2em 0.5em;
+    padding: 1.2rem;
 		border-left: 4px solid var(--c-border);
 		border-radius: 4px;
 		background-color: var(--c-bg-2);

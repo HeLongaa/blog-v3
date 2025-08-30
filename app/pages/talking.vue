@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 import { decodeHtmlEntities } from '~/utils/html'
 
 const appConfig = useAppConfig()
@@ -167,18 +167,6 @@ function handleScroll() {
 		loadMore()
 	}
 }
-
-// 返回顶部相关
-const { y: scrollY } = useScroll(window)
-const showBackToTop = computed(() => scrollY.value > 300)
-
-function scrollToTop() {
-	window.scrollTo({
-		top: 0,
-		behavior: 'smooth',
-	})
-}
-
 // 滚动到评论区
 function scrollToComment(content: string) {
 	const commentSection = document.getElementById('comment-section')
@@ -328,18 +316,6 @@ onUnmounted(() => {
 	<div id="comment-section">
 		<PostComment />
 	</div>
-
-	<!-- 返回顶部 -->
-	<Transition name="fade">
-		<button
-			v-if="showBackToTop"
-			class="back-to-top"
-			aria-label="返回顶部"
-			@click="scrollToTop"
-		>
-			<Icon name="ph:arrow-up-bold" />
-		</button>
-	</Transition>
 </div>
 </template>
 
