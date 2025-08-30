@@ -98,7 +98,7 @@ export default defineAppConfig({
 				{ icon: 'ph:lightning-bold', text: '瞬间', url: '/talking' },
 				{ icon: 'ph:link-bold', text: '友链', url: '/link' },
 				{ icon: 'ph:users-bold', text: '朋友动态', url: '/friends' },
-				{ icon: 'ph:user-bold', text: '关于', url: '/about' },
+				{ icon: 'ph:info-bold', text: '关于', url: '/about' },
 				{ icon: 'ph:archive-bold', text: '归档', url: '/archive' },
 				{ icon: 'ph:chat-circle-dots-bold', text: '留言板', url: '/messages' },
 			],

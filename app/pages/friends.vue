@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import blogConfig from '~~/blog.config'
 import { decodeHtmlEntities, stripHtmlAndDecode } from '~/utils/html'
+import { getFavicon } from '~/utils/img'
+
 interface FriendPost {
-  domain: string
-  title: string
-  date: string
-  link: string
-  content: string
-  author: string
+	domain: string
+	title: string
+	date: string
+	link: string
+	content: string
+	author: string
 }
 
 const layoutStore = useLayoutStore()
@@ -16,8 +18,8 @@ layoutStore.setAside(['blog-stats', 'comm-group'])
 const dataCacheStore = useDataCacheStore()
 
 useSeoMeta({
-  title: '朋友动态',
-  description: '来自朋友们的最新文章动态',
+	title: '朋友动态',
+	description: '来自朋友们的最新文章动态',
 })
 
 // 数据状态
@@ -30,246 +32,259 @@ const currentIndex = ref(0)
 const pageSize = 20
 
 // 格式化时间
-const formatDate = (dateStr: string) => {
-  return new Date(dateStr).toLocaleDateString('zh-CN', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  })
+function formatDate(dateStr: string) {
+	return new Date(dateStr).toLocaleDateString('zh-CN', {
+		year: 'numeric',
+		month: 'short',
+		day: 'numeric',
+		hour: '2-digit',
+		minute: '2-digit',
+	})
 }
 
-const getFavicon = (domain: string) => {
-  return `https://api.jiangcheng.site/api/favicon?url=${domain}`
-}
+function updateDisplayedPosts() {
+	const endIndex = Math.min(currentIndex.value + pageSize, allPosts.value.length)
+	const newPosts = allPosts.value.slice(currentIndex.value, endIndex)
 
-const updateDisplayedPosts = () => {
-  const endIndex = Math.min(currentIndex.value + pageSize, allPosts.value.length)
-  const newPosts = allPosts.value.slice(currentIndex.value, endIndex)
-  
-  if (newPosts.length === 0) {
-    hasMore.value = false
-    return
-  }
-  
-  displayedPosts.value.push(...newPosts)
-  currentIndex.value = endIndex
-  
-  if (endIndex >= allPosts.value.length) {
-    hasMore.value = false
-  }
+	if (newPosts.length === 0) {
+		hasMore.value = false
+		return
+	}
+
+	displayedPosts.value.push(...newPosts)
+	currentIndex.value = endIndex
+
+	if (endIndex >= allPosts.value.length) {
+		hasMore.value = false
+	}
 }
 
 // 加载所有文章数据
-const loadAllPosts = async (forceRefresh = false) => {
-  if (!initialLoading.value) {
-    loading.value = true
-  }
-  
-  try {
-    // 尝试从缓存获取数据
-    const cachedData = dataCacheStore.getCache<FriendPost[]>('friends-posts')
-    if (!forceRefresh && cachedData) {
-      allPosts.value = cachedData
-      displayedPosts.value = []
-      currentIndex.value = 0
-      hasMore.value = cachedData.length > 0
-      updateDisplayedPosts()
-      return
-    }
+async function loadAllPosts(forceRefresh = false) {
+	if (!initialLoading.value) {
+		loading.value = true
+	}
 
-    const response = await fetch(blogConfig.data.api_endpoint + '/rss_data.json')
-    if (!response.ok) throw new Error('Failed to fetch')
-    
-    const data = await response.json()
-    
-    if (data && Array.isArray(data)) {
-      // 按日期排序
-      const sortedData = data.sort((a: FriendPost, b: FriendPost) => 
-        new Date(b.date).getTime() - new Date(a.date).getTime()
-      )
-      
-      allPosts.value = sortedData
-      dataCacheStore.setCache('friends-posts', sortedData, 5 * 60 * 1000) // 5分钟缓存
-      
-      // 重置显示状态
-      displayedPosts.value = []
-      currentIndex.value = 0
-      hasMore.value = sortedData.length > 0
-      
-      // 加载第一页
-      updateDisplayedPosts()
-    } else {
-      allPosts.value = []
-      displayedPosts.value = []
-      hasMore.value = false
-    }
-  } catch (error) {
-    console.error('获取朋友动态失败:', error)
-    allPosts.value = []
-    displayedPosts.value = []
-    hasMore.value = false
-  } finally {
-    loading.value = false
-    initialLoading.value = false
-  }
+	try {
+		// 尝试从缓存获取数据
+		const cachedData = dataCacheStore.getCache<FriendPost[]>('friends-posts')
+		if (!forceRefresh && cachedData) {
+			allPosts.value = cachedData
+			displayedPosts.value = []
+			currentIndex.value = 0
+			hasMore.value = cachedData.length > 0
+			updateDisplayedPosts()
+			return
+		}
+
+		const response = await fetch(`${blogConfig.data.api_endpoint}/rss_data.json`)
+		if (!response.ok)
+			throw new Error('Failed to fetch')
+
+		const data = await response.json()
+
+		if (data && Array.isArray(data)) {
+			// 按日期排序
+			const sortedData = data.sort((a: FriendPost, b: FriendPost) =>
+				new Date(b.date).getTime() - new Date(a.date).getTime(),
+			)
+
+			allPosts.value = sortedData
+			dataCacheStore.setCache('friends-posts', sortedData, 5 * 60 * 1000) // 5分钟缓存
+
+			// 重置显示状态
+			displayedPosts.value = []
+			currentIndex.value = 0
+			hasMore.value = sortedData.length > 0
+
+			// 加载第一页
+			updateDisplayedPosts()
+		}
+		else {
+			allPosts.value = []
+			displayedPosts.value = []
+			hasMore.value = false
+		}
+	}
+	catch (error) {
+		console.error('获取朋友动态失败:', error)
+		allPosts.value = []
+		displayedPosts.value = []
+		hasMore.value = false
+	}
+	finally {
+		loading.value = false
+		initialLoading.value = false
+	}
 }
 
 // 加载更多
-const loadMore = () => {
-  if (loading.value || !hasMore.value) return
-  
-  loading.value = true
-  setTimeout(() => {
-    updateDisplayedPosts()
-    loading.value = false
-  }, 300)
+function loadMore() {
+	if (loading.value || !hasMore.value)
+		return
+
+	loading.value = true
+	setTimeout(() => {
+		updateDisplayedPosts()
+		loading.value = false
+	}, 300)
 }
 
 // 滚动加载
 const { arrivedState, y: scrollY } = useScroll(window, {
-  offset: { bottom: 100 }
+	offset: { bottom: 100 },
 })
 
 // 显示返回顶部按钮
 const showBackToTop = computed(() => scrollY.value > 300)
 
 // 返回顶部
-const scrollToTop = () => {
-  window.scrollTo({
-    top: 0,
-    behavior: 'smooth'
-  })
+function scrollToTop() {
+	window.scrollTo({
+		top: 0,
+		behavior: 'smooth',
+	})
 }
 
 watch(() => arrivedState.bottom, (isBottom) => {
-  if (isBottom) {
-    loadMore()
-  }
+	if (isBottom) {
+		loadMore()
+	}
 })
 
 // 初始加载
 onMounted(() => {
-  loadAllPosts()
+	loadAllPosts()
 })
 </script>
 
 <template>
-  <div class="friends-page">
-    <div class="page-header">
-      <h1 class="text-creative">朋友动态</h1>
-      <p class="page-desc">来自朋友们的最新文章动态</p>
-    </div>
+<div class="friends-page">
+	<div class="page-header">
+		<h1 class="text-creative">
+			朋友动态
+		</h1>
+		<p class="page-desc">
+			来自朋友们的最新文章动态
+		</p>
+	</div>
 
-    <div class="posts-container">
-      <!-- 初始加载状态 -->
-      <div v-if="initialLoading">
-        <div class="loading-container">
-          <Icon name="ph:circle-notch" class="loading-icon" />
-          <span>正在加载朋友动态...</span>
-        </div>
+	<div class="posts-container">
+		<!-- 初始加载状态 -->
+		<div v-if="initialLoading">
+			<div class="loading-container">
+				<Icon name="ph:circle-notch" class="loading-icon" />
+				<span>正在加载朋友动态...</span>
+			</div>
 
-        <!-- 骨架屏 -->
-        <div class="skeleton-container">
-          <div v-for="i in 3" :key="i" class="skeleton-post">
-            <div class="skeleton-header">
-              <div class="skeleton-avatar"></div>
-              <div class="skeleton-info">
-                <div class="skeleton-name"></div>
-                <div class="skeleton-domain"></div>
-              </div>
-            </div>
-            <div class="skeleton-content">
-              <div class="skeleton-title"></div>
-              <div class="skeleton-text"></div>
-              <div class="skeleton-text short"></div>
-            </div>
-          </div>
-        </div>
-      </div>
+			<!-- 骨架屏 -->
+			<div class="skeleton-container">
+				<div v-for="i in 3" :key="i" class="skeleton-post">
+					<div class="skeleton-header">
+						<div class="skeleton-avatar" />
+						<div class="skeleton-info">
+							<div class="skeleton-name" />
+							<div class="skeleton-domain" />
+						</div>
+					</div>
+					<div class="skeleton-content">
+						<div class="skeleton-title" />
+						<div class="skeleton-text" />
+						<div class="skeleton-text short" />
+					</div>
+				</div>
+			</div>
+		</div>
 
-      <!-- 文章列表 -->
-      <div v-else class="posts-list">
-        <TransitionGroup name="post" tag="div" class="post-grid">
-          <article
-            v-for="(post, index) in displayedPosts"
-            :key="`${post.domain}-${post.title}-${index}`"
-            class="post-card"
-            :style="{ '--delay': `${(index % pageSize) * 0.05}s` }"
-          >
-            <a 
-              :href="post.link" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              class="post-link"
-            >
-              <div class="post-main">
-                <div class="post-header">
-                  <img
-                    :src="getFavicon(post.domain)"
-                    :alt="`${post.author} avatar`"
-                    class="author-avatar"
-                    loading="lazy"
-                    @error="(e: Event) => { const img = e.target as HTMLImageElement; if (img) img.src = '/favicon.ico' }"
-                  >
-                  <div class="author-info">
-                    <div class="author-details">
-                      <h3 class="author-name">{{ decodeHtmlEntities(post.author) }}</h3>
-                      <p class="post-domain">{{ post.domain }}</p>
-                    </div>
-                  </div>
-                </div>
-                
-                <div class="post-content">
-                  <h2 class="post-title">{{ decodeHtmlEntities(post.title) }}</h2>
-                  <p class="post-excerpt" v-if="post.content">
-                    {{ stripHtmlAndDecode(post.content).substring(0, 150) }}{{ post.content.length > 150 ? '...' : '' }}
-                  </p>
-                </div>
-              </div>
-              
-              <time class="post-date">{{ formatDate(post.date) }}</time>
-            </a>
-          </article>
-        </TransitionGroup>
-      </div>
+		<!-- 文章列表 -->
+		<div v-else class="posts-list">
+			<TransitionGroup name="post" tag="div" class="post-grid">
+				<article
+					v-for="(post, index) in displayedPosts"
+					:key="`${post.domain}-${post.title}-${index}`"
+					class="post-card"
+					:style="{ '--delay': `${(index % pageSize) * 0.05}s` }"
+				>
+					<a
+						:href="post.link"
+						target="_blank"
+						rel="noopener noreferrer"
+						class="post-link"
+					>
+						<div class="post-main">
+							<div class="post-header">
+								<img
+									:src="getFavicon(post.domain)"
+									:alt="`${post.author} avatar`"
+									class="author-avatar"
+									loading="lazy"
+									@error="(e: Event) => {
+										const img = e.target as HTMLImageElement;
+										if (img && img.src.includes('site-img.helong.online')) {
+											img.src = `https://api.jiangcheng.site/api/favicon?url=${post.domain}`
+										}
+										else if (img && img.src.includes('api.jiangcheng.site')) {
+											img.src = '/favicon.ico'
+										}
+									}"
+								>
+								<div class="author-info">
+									<div class="author-details">
+										<h3 class="author-name">{{ decodeHtmlEntities(post.author) }}</h3>
+										<p class="post-domain">{{ post.domain }}</p>
+									</div>
+								</div>
+							</div>
 
-      <!-- 加载更多 -->
-      <div v-if="loading && !initialLoading" class="loading-more">
-        <Icon name="ph:circle-notch" class="loading-icon" />
-        <span>加载更多...</span>
-      </div>
+							<div class="post-content">
+								<h2 class="post-title">{{ decodeHtmlEntities(post.title) }}</h2>
+								<p v-if="post.content" class="post-excerpt">
+									{{ stripHtmlAndDecode(post.content).substring(0, 150) }}{{ post.content.length > 150 ? '...' : '' }}
+								</p>
+							</div>
+						</div>
 
-      <!-- 没有更多 -->
-      <div v-if="!hasMore && displayedPosts.length > 0" class="no-more">
-        <Icon name="ph:check-circle-bold" />
-        <span>已加载全部动态</span>
-      </div>
+						<time class="post-date">{{ formatDate(post.date) }}</time>
+					</a>
+				</article>
+			</TransitionGroup>
+		</div>
 
-      <!-- 空状态 -->
-      <div v-if="!initialLoading && !loading && displayedPosts.length === 0" class="empty-state">
-        <Icon name="ph:smiley-sad" />
-        <p>暂时没有朋友动态</p>
-        <button @click="loadAllPosts(true)" class="retry-btn">
-          <Icon name="ph:arrow-clockwise-bold" />
-          重新加载
-        </button>
-      </div>
-    </div>
+		<!-- 加载更多 -->
+		<div v-if="loading && !initialLoading" class="loading-more">
+			<Icon name="ph:circle-notch" class="loading-icon" />
+			<span>加载更多...</span>
+		</div>
 
-    <!-- 返回顶部 -->
-    <Transition name="fade">
-      <button
-        v-if="showBackToTop"
-        @click="scrollToTop"
-        class="back-to-top"
-        aria-label="返回顶部"
-      >
-        <Icon name="ph:arrow-up-bold" />
-      </button>
-    </Transition>
-  </div>
+		<!-- 没有更多 -->
+		<div v-if="!hasMore && displayedPosts.length > 0" class="no-more">
+			<Icon name="ph:check-circle-bold" />
+			<span>已加载全部动态</span>
+		</div>
+
+		<!-- 空状态 -->
+		<div v-if="!initialLoading && !loading && displayedPosts.length === 0" class="empty-state">
+			<Icon name="ph:smiley-sad" />
+			<p>暂时没有朋友动态</p>
+			<button class="retry-btn" @click="loadAllPosts(true)">
+				<Icon name="ph:arrow-clockwise-bold" />
+				重新加载
+			</button>
+		</div>
+	</div>
+
+	<!-- 返回顶部 -->
+	<Transition name="fade">
+		<button
+			v-if="showBackToTop"
+			class="back-to-top"
+			aria-label="返回顶部"
+			@click="scrollToTop"
+		>
+			<Icon name="ph:arrow-up-bold" />
+		</button>
+	</Transition>
+</div>
 </template>
 
 <style lang="scss" scoped>
@@ -277,7 +292,7 @@ onMounted(() => {
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem 1rem;
-  
+
   @media (max-width: 768px) {
     padding: 1rem 0.5rem;
   }
@@ -286,18 +301,18 @@ onMounted(() => {
 .page-header {
   text-align: center;
   margin-bottom: 3rem;
-  
+
   h1 {
     font-size: 2.5rem;
     font-weight: 700;
     color: var(--c-text-1);
     margin-bottom: 0.5rem;
-    
+
     @media (max-width: 768px) {
       font-size: 2rem;
     }
   }
-  
+
   .page-desc {
     color: var(--c-text-2);
     font-size: 1.1rem;
@@ -315,7 +330,7 @@ onMounted(() => {
   padding: 3rem 2rem;
   color: var(--c-text-2);
   font-size: 1.1rem;
-  
+
   .loading-icon {
     font-size: 1.5rem;
     animation: spin 1s linear infinite;
@@ -327,7 +342,7 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  
+
   @media (max-width: 768px) {
     gap: 0.75rem;
   }
@@ -341,12 +356,12 @@ onMounted(() => {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   animation: fade-in 0.6s ease-out backwards;
   animation-delay: var(--delay);
-  
+
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
     border-color: var(--c-brand);
-    
+
     .post-title {
       color: var(--c-brand);
     }
@@ -362,7 +377,7 @@ onMounted(() => {
   color: inherit;
   gap: 1rem;
   background: var(--ld-bg-card);;
-  
+
   @media (max-width: 768px) {
     flex-direction: column;
     align-items: flex-start;
@@ -396,7 +411,7 @@ onMounted(() => {
   object-fit: cover;
   border: 2px solid var(--c-border);
   transition: border-color 0.3s ease;
-  
+
   @media (max-width: 768px) {
     width: 40px;
     height: 40px;
@@ -411,7 +426,7 @@ onMounted(() => {
     margin: 0 0 0.25rem 0;
     line-height: 1.2;
   }
-  
+
   .post-domain {
     font-size: 0.8rem;
     color: var(--c-text-3);
@@ -427,7 +442,7 @@ onMounted(() => {
   flex-shrink: 0;
   align-self: flex-start;
   margin-top: 0.25rem;
-  
+
   @media (max-width: 768px) {
     font-size: 0.8rem;
     align-self: flex-end;
@@ -438,11 +453,11 @@ onMounted(() => {
 .post-content {
   flex: 1;
   min-width: 0;
-  
+
   @media (max-width: 768px) {
     width: 100%;
   }
-  
+
   .post-title {
     font-size: 1.1rem;
     font-weight: 600;
@@ -450,32 +465,32 @@ onMounted(() => {
     color: var(--c-text-1);
     margin: 0 0 0.25rem 0;
     transition: color 0.3s ease;
-    
+
     display: -webkit-box;
     -webkit-line-clamp: 1;
     line-clamp: 1;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    
+
     @media (max-width: 768px) {
       font-size: 1rem;
       -webkit-line-clamp: 2;
       line-clamp: 2;
     }
   }
-  
+
   .post-excerpt {
     color: var(--c-text-3);
     line-height: 1.4;
     margin: 0;
     font-size: 0.85rem;
-    
+
     display: -webkit-box;
     -webkit-line-clamp: 1;
     line-clamp: 1;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    
+
     @media (max-width: 768px) {
       -webkit-line-clamp: 2;
       line-clamp: 2;
@@ -487,12 +502,12 @@ onMounted(() => {
   text-align: center;
   padding: 4rem 2rem;
   color: var(--c-text-3);
-  
+
   svg {
     font-size: 3rem;
     margin-bottom: 1rem;
   }
-  
+
   p {
     font-size: 1.1rem;
     margin: 0 0 1.5rem 0;
@@ -512,12 +527,12 @@ onMounted(() => {
   font-size: 0.95rem;
   font-weight: 500;
   transition: all 0.3s ease;
-  
+
   &:hover {
     background: var(--c-brand-dark);
     transform: translateY(-1px);
   }
-  
+
   &:active {
     transform: translateY(0);
   }
@@ -542,7 +557,7 @@ onMounted(() => {
   backdrop-filter: blur(8px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   z-index: 100;
-  
+
   &:hover {
     background: var(--c-brand);
     color: var(--c-primary);
@@ -550,19 +565,19 @@ onMounted(() => {
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
   }
-  
+
   &:active {
     transform: translateY(-1px);
   }
-  
+
   svg {
     transition: transform 0.2s ease;
   }
-  
+
   &:hover svg {
     transform: translateY(-1px);
   }
-  
+
   @media (max-width: 768px) {
     bottom: 8rem;
     // right: 1.5rem;
@@ -674,14 +689,14 @@ onMounted(() => {
     border-radius: 4px;
     margin-bottom: 0.75rem;
   }
-  
+
   .skeleton-text {
     width: 100%;
     height: 14px;
     background: var(--c-bg-mute);
     border-radius: 4px;
     margin-bottom: 0.5rem;
-    
+
     &.short {
       width: 60%;
     }

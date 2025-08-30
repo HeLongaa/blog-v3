@@ -21,8 +21,8 @@ const appConfig = useAppConfig()
 	</nav>
 	<div class="footer-bottom">
 		<p>
-			本站由 HeLong 使用<ProseA href="https://github.com/HeLongaa/Blog-Astro">
-				vhAstro-Theme
+			本站由 HeLong 使用<ProseA href="https://github.com/HeLongaa/blog-v3">
+      纸鹿的开源博客
 			</ProseA> 主题创建。
 		</p>
 		<p>
@@ -31,8 +31,7 @@ const appConfig = useAppConfig()
 			</ProseA>    许可协议。
 		</p>
 		<p>
-			完整转载请注明来自 <a data-v-8bf76745="" href="https://blog.helong.online" rel="noopener noreferrer" target="_blank" class="badge round"><img data-v-8bf76745="" alt="https://api.jiangcheng.site/api/favicon?url=blog.helong.online" data-nuxt-img="" srcset="https://api.jiangcheng.site/api/favicon?url=blog.helong.online 1x, https://api.jiangcheng.site/api/favicon?url=blog.helong.online 2x" class="badge-icon" src="https://api.jiangcheng.site/api/favicon?url=blog.helong.online"><span data-v-8bf76745="" class="badge-text">硅基漫游指南</span></a>
-			。
+			完整转载请注明来自 <Badge link="https://blog.helong.online">硅基漫游指南</Badge>
 		</p>
 	</div>
 </footer>

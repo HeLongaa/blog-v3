@@ -475,7 +475,7 @@ onUnmounted(() => {
     font-size: 1.1rem;
 
     .verified {
-      color: var(--c-brand);
+      color: var(--c-primary);
       font-size: 1.2em;
     }
 
