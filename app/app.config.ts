@@ -13,7 +13,7 @@ export default defineAppConfig({
 		categories: <{ [category: string]: { icon: string, color?: string } }>{
 			杂谈: { icon: 'ph:chat-bold', color: '#3ba' },
 			生活: { icon: 'ph:shooting-star-bold', color: '#f77' },
-			未分类: { icon: 'ph:folder-dotted-bold' },
+			未分类: { icon: 'ph:folder-dotted-bold', color: 'rgba(52,73,94,0.81)' },
 			云服务: { icon: 'mdi:cloud-outline', color: '#3af' },
 			开发运维: { icon: 'simple-icons:devbox', color: '#77f' },
 			工具: { icon: 'mynaui:tool', color: '#02941fff' },

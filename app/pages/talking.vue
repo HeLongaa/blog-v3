@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { decodeHtmlEntities } from '~/utils/html'
-import { ref, onMounted, onUnmounted, computed } from 'vue'
 
 const appConfig = useAppConfig()
 useSeoMeta({
-  title: '瞬间',
-  description: `记录 ${appConfig.author.name} 的瞬间想法和生活片段。`,
+	title: '瞬间',
+	description: `记录 ${appConfig.author.name} 的瞬间想法和生活片段。`,
 })
 
 const layoutStore = useLayoutStore()
@@ -14,24 +14,24 @@ layoutStore.setAside(['blog-stats', 'blog-log', 'friend-posts'])
 const dataCacheStore = useDataCacheStore()
 
 interface MomentItem {
-  date: string;
-  tags: string[];
-  content: string;
-  img?: string;
-  is_top: boolean;
+	date: string
+	tags: string[]
+	content: string
+	img?: string
+	is_top: boolean
 }
 
 interface DisplayMoment {
-  name: string;
-  avatar: string;
-  avatarLink: string;
-  moment_list: {
-    content: string;
-    date: string;
-    image?: string[];
-    tags?: string[];
-    is_top?: boolean;
-  }[];
+	name: string
+	avatar: string
+	avatarLink: string
+	moment_list: {
+		content: string
+		date: string
+		image?: string[]
+		tags?: string[]
+		is_top?: boolean
+	}[]
 }
 
 const allMomentsData = ref<MomentItem[]>([])
@@ -43,291 +43,304 @@ const currentIndex = ref(0)
 const pageSize = 10
 
 // 计算当前页的显示数据
-const updateDisplayedMoments = () => {
-  const endIndex = Math.min(currentIndex.value + pageSize, allMomentsData.value.length)
-  const newMoments = allMomentsData.value.slice(currentIndex.value, endIndex)
-  
-  if (newMoments.length === 0) {
-    hasMore.value = false
-    return
-  }
-  
-  // 转换数据格式
-  const displayData: DisplayMoment[] = newMoments.map(item => ({
-    name: appConfig.author.name,
-    avatar: appConfig.header.logo,
-    avatarLink: '/',
-    moment_list: [{
-      content: item.content,
-      date: formatDate(item.date),
-      image: item.img ? [item.img] : undefined,
-      tags: item.tags,
-      is_top: item.is_top
-    }]
-  }))
-  
-  displayedMoments.value.push(...displayData)
-  currentIndex.value = endIndex
-  
-  if (endIndex >= allMomentsData.value.length) {
-    hasMore.value = false
-  }
+function updateDisplayedMoments() {
+	const endIndex = Math.min(currentIndex.value + pageSize, allMomentsData.value.length)
+	const newMoments = allMomentsData.value.slice(currentIndex.value, endIndex)
+
+	if (newMoments.length === 0) {
+		hasMore.value = false
+		return
+	}
+
+	// 转换数据格式
+	const displayData: DisplayMoment[] = newMoments.map(item => ({
+		name: appConfig.author.name,
+		avatar: getGhAvatar(appConfig.author.name),
+		avatarLink: '/',
+		moment_list: [{
+			content: item.content,
+			date: formatDate(item.date),
+			image: item.img ? [item.img] : undefined,
+			tags: item.tags,
+			is_top: item.is_top,
+		}],
+	}))
+
+	displayedMoments.value.push(...displayData)
+	currentIndex.value = endIndex
+
+	if (endIndex >= allMomentsData.value.length) {
+		hasMore.value = false
+	}
 }
 
 // 获取所有动态数据
 async function fetchAllMoments(forceRefresh = false) {
-  if (loading.value && !initialLoading.value) return
-  
-  if (initialLoading.value) {
-    initialLoading.value = true
-  } else {
-    loading.value = true
-  }
-  
-  try {
-    const data = await dataCacheStore.getMoments(forceRefresh)
-    allMomentsData.value = data
-    
-    // 重置分页状态
-    displayedMoments.value = []
-    currentIndex.value = 0
-    hasMore.value = data.length > 0
-    
-    // 加载第一页
-    updateDisplayedMoments()
-  } catch (error) {
-    console.error('获取动态数据失败:', error)
-    hasMore.value = false
-  } finally {
-    loading.value = false
-    initialLoading.value = false
-  }
+	if (loading.value && !initialLoading.value)
+		return
+
+	if (initialLoading.value) {
+		initialLoading.value = true
+	}
+	else {
+		loading.value = true
+	}
+
+	try {
+		const data = await dataCacheStore.getMoments(forceRefresh)
+		allMomentsData.value = data
+
+		// 重置分页状态
+		displayedMoments.value = []
+		currentIndex.value = 0
+		hasMore.value = data.length > 0
+
+		// 加载第一页
+		updateDisplayedMoments()
+	}
+	catch (error) {
+		console.error('获取动态数据失败:', error)
+		hasMore.value = false
+	}
+	finally {
+		loading.value = false
+		initialLoading.value = false
+	}
 }
 
 // 加载更多数据
 function loadMore() {
-  if (loading.value || !hasMore.value) return
-  
-  loading.value = true
-  setTimeout(() => {
-    updateDisplayedMoments()
-    loading.value = false
-  }, 300) // 添加轻微延迟以改善用户体验
+	if (loading.value || !hasMore.value)
+		return
+
+	loading.value = true
+	setTimeout(() => {
+		updateDisplayedMoments()
+		loading.value = false
+	}, 300) // 添加轻微延迟以改善用户体验
 }
 
 // 格式化日期
 function formatDate(dateString: string) {
-  const date = new Date(dateString)
-  const now = new Date()
-  const diff = now.getTime() - date.getTime()
-  
-  const minute = 60 * 1000
-  const hour = 60 * minute
-  const day = 24 * hour
-  const month = 30 * day
-  const year = 365 * day
-  
-  if (diff < hour) {
-    const minutes = Math.floor(diff / minute)
-    return minutes <= 0 ? '刚刚' : `${minutes}分钟前`
-  } else if (diff < day) {
-    const hours = Math.floor(diff / hour)
-    return `${hours}小时前`
-  } else if (diff < month) {
-    const days = Math.floor(diff / day)
-    return `${days}天前`
-  } else if (diff < year) {
-    const months = Math.floor(diff / month)
-    return `${months}个月前`
-  } else {
-    return date.toLocaleDateString('zh-CN', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })
-  }
+	const date = new Date(dateString)
+	const now = new Date()
+	const diff = now.getTime() - date.getTime()
+
+	const minute = 60 * 1000
+	const hour = 60 * minute
+	const day = 24 * hour
+	const month = 30 * day
+	const year = 365 * day
+
+	if (diff < hour) {
+		const minutes = Math.floor(diff / minute)
+		return minutes <= 0 ? '刚刚' : `${minutes}分钟前`
+	}
+	else if (diff < day) {
+		const hours = Math.floor(diff / hour)
+		return `${hours}小时前`
+	}
+	else if (diff < month) {
+		const days = Math.floor(diff / day)
+		return `${days}天前`
+	}
+	else if (diff < year) {
+		const months = Math.floor(diff / month)
+		return `${months}个月前`
+	}
+	else {
+		return date.toLocaleDateString('zh-CN', {
+			year: 'numeric',
+			month: 'long',
+			day: 'numeric',
+		})
+	}
 }
 
 // 滚动加载
 function handleScroll() {
-  const scrollTop = window.pageYOffset || document.documentElement.scrollTop
-  const windowHeight = window.innerHeight
-  const documentHeight = document.documentElement.scrollHeight
-  
-  if (scrollTop + windowHeight >= documentHeight - 100) {
-    loadMore()
-  }
+	const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+	const windowHeight = window.innerHeight
+	const documentHeight = document.documentElement.scrollHeight
+
+	if (scrollTop + windowHeight >= documentHeight - 100) {
+		loadMore()
+	}
 }
 
 // 返回顶部相关
 const { y: scrollY } = useScroll(window)
 const showBackToTop = computed(() => scrollY.value > 300)
 
-const scrollToTop = () => {
-  window.scrollTo({
-    top: 0,
-    behavior: 'smooth'
-  })
+function scrollToTop() {
+	window.scrollTo({
+		top: 0,
+		behavior: 'smooth',
+	})
 }
 
 // 滚动到评论区
 function scrollToComment(content: string) {
-  const commentSection = document.getElementById('comment-section')
-  if (commentSection) {
-    commentSection.scrollIntoView({ behavior: 'smooth' })
-    
-    setTimeout(() => {
-      const textarea = commentSection.querySelector('textarea')
-      if (textarea) {
-        textarea.focus()
-        textarea.value = `> ${content}\n\n`
-        textarea.dispatchEvent(new Event('input', { bubbles: true }))
-      }
-    }, 500)
-  }
+	const commentSection = document.getElementById('comment-section')
+	if (commentSection) {
+		commentSection.scrollIntoView({ behavior: 'smooth' })
+
+		setTimeout(() => {
+			const textarea = commentSection.querySelector('textarea')
+			if (textarea) {
+				textarea.focus()
+				textarea.value = `> ${content}\n\n`
+				textarea.dispatchEvent(new Event('input', { bubbles: true }))
+			}
+		}, 500)
+	}
 }
 
 onMounted(() => {
-  fetchAllMoments()
-  window.addEventListener('scroll', handleScroll)
+	fetchAllMoments()
+	window.addEventListener('scroll', handleScroll)
 })
 
 onUnmounted(() => {
-  window.removeEventListener('scroll', handleScroll)
+	window.removeEventListener('scroll', handleScroll)
 })
 </script>
 
 <template>
-  <div class="moments-container">
-    <div class="moments-header">
-      <h1>
-        <Icon name="ph:lightning-bold" />
-        瞬间
-      </h1>
-      <p>记录生活的美好瞬间</p>
-    </div>
+<div class="moments-container">
+	<div class="moments-header">
+		<h1>
+			<Icon name="ph:lightning-bold" />
+			瞬间
+		</h1>
+		<p>记录生活的美好瞬间</p>
+	</div>
 
-    <div class="moments-list">
-      <!-- 初始加载状态 -->
-      <div v-if="initialLoading">
-        <div class="loading-container">
-          <Icon name="ph:circle-notch" class="loading-icon" />
-          <span>正在加载瞬间...</span>
-        </div>
-        
-        <!-- 骨架屏 -->
-        <div class="skeleton-container">
-          <div v-for="i in 3" :key="i" class="skeleton-moment">
-            <div class="skeleton-header">
-              <div class="skeleton-avatar"></div>
-              <div class="skeleton-info">
-                <div class="skeleton-name"></div>
-                <div class="skeleton-date"></div>
-              </div>
-            </div>
-            <div class="skeleton-content">
-              <div class="skeleton-text"></div>
-              <div class="skeleton-text short"></div>
-            </div>
-          </div>
-        </div>
-      </div>
+	<div class="moments-list">
+		<!-- 初始加载状态 -->
+		<div v-if="initialLoading">
+			<div class="loading-container">
+				<Icon name="ph:circle-notch" class="loading-icon" />
+				<span>正在加载瞬间...</span>
+			</div>
 
-      <!-- 动态列表 -->
-      <div v-else v-for="(moment, groupIndex) in displayedMoments" :key="`${groupIndex}-${moment.name}`" class="moment-group">
-        <div 
-          v-for="(item, index) in moment.moment_list" 
-          :key="`${groupIndex}-${index}`" 
-          class="moment-item" 
-          :class="{ 'is-top': item.is_top }"
-          :style="{ '--delay': `${(groupIndex * moment.moment_list.length + index) * 0.1}s` }"
-        >
-          <!-- 置顶标签 -->
-          <div v-if="item.is_top" class="top-badge">
-            <Icon name="ph:push-pin-bold" />
-            置顶
-          </div>
+			<!-- 骨架屏 -->
+			<div class="skeleton-container">
+				<div v-for="i in 3" :key="i" class="skeleton-moment">
+					<div class="skeleton-header">
+						<div class="skeleton-avatar" />
+						<div class="skeleton-info">
+							<div class="skeleton-name" />
+							<div class="skeleton-date" />
+						</div>
+					</div>
+					<div class="skeleton-content">
+						<div class="skeleton-text" />
+						<div class="skeleton-text short" />
+					</div>
+				</div>
+			</div>
+		</div>
 
-          <div class="moment-meta">
-            <a :href="moment.avatarLink" class="avatar-link">
-              <img :src="moment.avatar" :alt="moment.name" class="avatar" />
-            </a>
-            <div class="info">
-              <div class="moment-nick">
-                {{ moment.name }}
-                <Icon name="ph:seal-check-fill" class="verified" />
-              </div>
-              <div class="moment-date">{{ item.date }}</div>
-            </div>
-          </div>
+		<!-- 动态列表 -->
+		<div v-for="(moment, groupIndex) in displayedMoments" v-else :key="`${groupIndex}-${moment.name}`" class="moment-group">
+			<div
+				v-for="(item, index) in moment.moment_list"
+				:key="`${groupIndex}-${index}`"
+				class="moment-item"
+				:class="{ 'is-top': item.is_top }"
+				:style="{ '--delay': `${(groupIndex * moment.moment_list.length + index) * 0.1}s` }"
+			>
+				<!-- 置顶标签 -->
+				<div v-if="item.is_top" class="top-badge">
+					<Icon name="ph:push-pin-bold" />
+					置顶
+				</div>
 
-          <div class="moment-content">
-            <p class="content-text">{{ decodeHtmlEntities(item.content) }}</p>
-            <div v-if="item.image && item.image.length > 0" class="image-grid">
-              <a
-                v-for="(img, imgIndex) in item.image"
-                :key="imgIndex"
-                :href="img"
-                target="_blank"
-                class="grid-item"
-                rel="noopener noreferrer"
-              >
-                <img :src="img" :alt="`图片 ${imgIndex + 1}`" class="grid-img" />
-              </a>
-            </div>
-          </div>
+				<div class="moment-meta">
+					<a :href="moment.avatarLink" class="avatar-link">
+						<img :src="moment.avatar" :alt="moment.name" class="avatar">
+					</a>
+					<div class="info">
+						<div class="moment-nick">
+							{{ moment.name }}
+							<Icon name="ph:seal-check-fill" class="verified" />
+						</div>
+						<div class="moment-date">
+							{{ item.date }}
+						</div>
+					</div>
+				</div>
 
-          <div class="moment-bottom">
-            <div class="moment-meta-info">
-              <div v-if="item.tags && item.tags.length > 0" class="moment-tags">
-                <span v-for="tag in item.tags" :key="tag" class="tag">
-                  <Icon name="ph:tag-bold" /> {{ tag }}
-                </span>
-              </div>
-            </div>
-            <button class="comment-btn" @click="scrollToComment(item.content)">
-              <Icon name="ph:chats-bold" />
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+				<div class="moment-content">
+					<p class="content-text">
+						{{ decodeHtmlEntities(item.content) }}
+					</p>
+					<div v-if="item.image && item.image.length > 0" class="image-grid">
+						<a
+							v-for="(img, imgIndex) in item.image"
+							:key="imgIndex"
+							:href="img"
+							target="_blank"
+							class="grid-item"
+							rel="noopener noreferrer"
+						>
+							<img :src="img" :alt="`图片 ${imgIndex + 1}`" class="grid-img">
+						</a>
+					</div>
+				</div>
 
-    <!-- 加载状态 -->
-    <div v-if="loading" class="loading-indicator">
-      <Icon name="ph:circle-notch" class="loading-icon" />
-      <span>加载中...</span>
-    </div>
+				<div class="moment-bottom">
+					<div class="moment-meta-info">
+						<div v-if="item.tags && item.tags.length > 0" class="moment-tags">
+							<span v-for="tag in item.tags" :key="tag" class="tag">
+								<Icon name="ph:tag-bold" /> {{ tag }}
+							</span>
+						</div>
+					</div>
+					<button class="comment-btn" @click="scrollToComment(item.content)">
+						<Icon name="ph:chats-bold" />
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
 
-    <!-- 没有更多数据 -->
-    <div v-if="!hasMore && displayedMoments.length > 0" class="no-more">
-      <Icon name="ph:check-circle-bold" />
-      <span>已加载全部动态</span>
-    </div>
+	<!-- 加载状态 -->
+	<div v-if="loading" class="loading-indicator">
+		<Icon name="ph:circle-notch" class="loading-icon" />
+		<span>加载中...</span>
+	</div>
 
-    <!-- 空状态 -->
-    <div v-if="!initialLoading && !loading && displayedMoments.length === 0" class="empty-state">
-      <Icon name="ph:smiley-sad" />
-      <p>暂时还没有动态</p>
-    </div>
+	<!-- 没有更多数据 -->
+	<div v-if="!hasMore && displayedMoments.length > 0" class="no-more">
+		<Icon name="ph:check-circle-bold" />
+		<span>已加载全部动态</span>
+	</div>
 
-    <!-- 评论区 -->
-    <div id="comment-section">
-      <PostComment />
-    </div>
+	<!-- 空状态 -->
+	<div v-if="!initialLoading && !loading && displayedMoments.length === 0" class="empty-state">
+		<Icon name="ph:smiley-sad" />
+		<p>暂时还没有动态</p>
+	</div>
 
-    <!-- 返回顶部 -->
-    <Transition name="fade">
-      <button
-        v-if="showBackToTop"
-        @click="scrollToTop"
-        class="back-to-top"
-        aria-label="返回顶部"
-      >
-        <Icon name="ph:arrow-up-bold" />
-      </button>
-    </Transition>
-  </div>
+	<!-- 评论区 -->
+	<div id="comment-section">
+		<PostComment />
+	</div>
+
+	<!-- 返回顶部 -->
+	<Transition name="fade">
+		<button
+			v-if="showBackToTop"
+			class="back-to-top"
+			aria-label="返回顶部"
+			@click="scrollToTop"
+		>
+			<Icon name="ph:arrow-up-bold" />
+		</button>
+	</Transition>
+</div>
 </template>
 
 <style lang="scss" scoped>
@@ -417,7 +430,7 @@ onUnmounted(() => {
   gap: 0.3rem;
   z-index: 2;
   box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
-  
+
   &::before {
     position: absolute;
     bottom: -4px;
@@ -480,7 +493,7 @@ onUnmounted(() => {
 
 .moment-content {
   min-height: 1.5rem; /* 确保没有图片时也有基本高度 */
-  
+
   .content-text {
     margin: 1rem 1rem 1rem .5rem;
     color: var(--c-text-1);
@@ -492,7 +505,7 @@ onUnmounted(() => {
       font-size: 1rem;
     }
   }
-  
+
   /* 当没有图片时，减少底部边距 */
   &:not(:has(.image-grid)) .content-text {
     margin-bottom: 0.5rem;
@@ -668,7 +681,7 @@ onUnmounted(() => {
   padding: 3rem 2rem;
   color: var(--c-text-2);
   font-size: 1.1rem;
-  
+
   .loading-icon {
     font-size: 1.5rem;
     animation: spin 1s linear infinite;
@@ -732,7 +745,7 @@ onUnmounted(() => {
     background: var(--c-bg-mute);
     border-radius: 4px;
     margin-bottom: 0.5rem;
-    
+
     &.short {
       width: 70%;
     }
@@ -768,7 +781,7 @@ onUnmounted(() => {
   backdrop-filter: blur(8px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   z-index: 100;
-  
+
   &:hover {
     background: var(--c-brand);
     color: white;
@@ -776,19 +789,19 @@ onUnmounted(() => {
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
   }
-  
+
   &:active {
     transform: translateY(-1px);
   }
-  
+
   svg {
     transition: transform 0.2s ease;
   }
-  
+
   &:hover svg {
     transform: translateY(-1px);
   }
-  
+
   @media (max-width: 768px) {
     bottom: 1.5rem;
     right: 1.5rem;

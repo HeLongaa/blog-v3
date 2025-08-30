@@ -19,7 +19,22 @@ const appConfig = useAppConfig()
 			</menu>
 		</div>
 	</nav>
-	<p v-html="appConfig.footer.copyright" />
+	<div class="footer-bottom">
+		<p>
+			本站由 HeLong 使用<ProseA href="https://github.com/HeLongaa/Blog-Astro">
+				vhAstro-Theme
+			</ProseA> 主题创建。
+		</p>
+		<p>
+			本博客所有文章除特别声明外，均采用    <ProseA :href="appConfig.copyright.url">
+				CC BY-NC-SA 4.0
+			</ProseA>    许可协议。
+		</p>
+		<p>
+			完整转载请注明来自 <a data-v-8bf76745="" href="https://blog.helong.online" rel="noopener noreferrer" target="_blank" class="badge round"><img data-v-8bf76745="" alt="https://api.jiangcheng.site/api/favicon?url=blog.helong.online" data-nuxt-img="" srcset="https://api.jiangcheng.site/api/favicon?url=blog.helong.online 1x, https://api.jiangcheng.site/api/favicon?url=blog.helong.online 2x" class="badge-icon" src="https://api.jiangcheng.site/api/favicon?url=blog.helong.online"><span data-v-8bf76745="" class="badge-text">硅基漫游指南</span></a>
+			。
+		</p>
+	</div>
 </footer>
 </template>
 
@@ -31,10 +46,29 @@ const appConfig = useAppConfig()
 
 	.footer-nav {
 		display: flex;
-		flex-wrap: wrap;
-		gap: 5vw clamp(2rem, 5%, 5vw);
-		padding-block: 3rem;
+		justify-content: space-between;
+		padding-block: 1.5rem;
 
+		.footer-nav-group{
+			flex: 1;
+			min-width: 0;
+		}
+
+		@media (max-width: 489px) {
+			flex-direction: column;
+			gap: 2rem;
+
+			.footer-nav-group{
+				flex: none;
+				text-align: center;
+
+				menu {
+					display: flex;
+					flex-direction: column;
+					align-items: center;
+				}
+			}
+		}
 		h3 {
 			margin: 0.5em;
 			font: inherit;
@@ -59,6 +93,53 @@ const appConfig = useAppConfig()
 
 	p {
 		margin: 0.5em;
+	}
+
+	.footer-bottom {
+		text-align: center;
+
+		p {
+			margin: 0.5rem 0;
+			font-size: 0.85rem;
+			line-height: 1.5;
+			//display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 0.3rem;
+
+			:deep(.iconify) {
+				width: 1em;
+				height: 1em;
+				vertical-align: middle;
+			}
+
+			a {
+				position: relative;
+				color: inherit;
+				text-decoration: none;
+				transition: color 0.3s ease;
+
+				&::after {
+					content: '';
+					position: absolute;
+					bottom: -2px;
+					left: 0;
+					width: 0;
+					height: 1px;
+					background-color: var(--c-primary);
+					transition: width 0.3s ease;
+				}
+
+				&:hover {
+					color: var(--c-primary);
+
+					&::after {
+						width: 100%;
+					}
+				}
+			}
+
+		}
 	}
 }
 </style>
