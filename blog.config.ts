@@ -50,8 +50,8 @@ const blogConfig = {
 	// 自己部署的 Artalk 服务
 	artalk: {
 		server: 'https://artalk.helong.online',
-		// site: '硅基漫游指南',
-		site: 'Local',
+		site: '硅基漫游指南',
+		// site: 'Local',
 	},
 
 	scripts: [
