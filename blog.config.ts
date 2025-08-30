@@ -8,7 +8,7 @@ export { zhCN as dateLocale } from 'date-fns/locale/zh-CN'
 // 此处为启动时需要的配置，启动后可变配置位于 app/app.config.ts
 const blogConfig = {
 	title: '硅基漫游指南',
-	subtitle: '纸鹿至麓不知路，支炉制露不止漉',
+	subtitle: '等待和犹豫才是这个世界上最无情的杀手',
 	// 长 description 利好于 SEO
 	description: '硅基漫游指南，分享技术与生活。这个博客记录了在生活和技术学习中的点滴经历，网站界面简洁美观，内容丰富实用，人气互动活跃，涵盖了编程、生活、学习等多个领域。',
 	author: {
@@ -47,19 +47,20 @@ const blogConfig = {
 	// 禁止搜索引擎收录的路径
 	robotsNotIndex: ['/preview', '/previews/*'],
 
-	scripts: [
-		// Artalk 评论系统
-		{ src: 'https://artalk.helong.online/dist/Artalk.js', defer: true },
-	],
-
 	// 自己部署的 Artalk 服务
 	artalk: {
 		server: 'https://artalk.helong.online',
 		site: '硅基漫游指南',
+		// site: 'Local',
 	},
 
-	data:{
-		api_endpoint: 'https://api-blog.helong.online'
+	scripts: [
+		// Artalk 评论系统
+		{ src: `https://artalk.helong.online/dist/Artalk.js`, defer: true },
+	],
+
+	data: {
+		api_endpoint: 'https://api-blog.helong.online',
 	},
 }
 

@@ -14,10 +14,10 @@ export default defineAppConfig({
 			杂谈: { icon: 'ph:chat-bold', color: '#3ba' },
 			生活: { icon: 'ph:shooting-star-bold', color: '#f77' },
 			未分类: { icon: 'ph:folder-dotted-bold' },
-			云服务:{icon: 'mdi:cloud-outline',color: '#3af'},
-			开发运维:{icon: 'simple-icons:devbox',color: '#77f'},
-			工具:{icon: 'mynaui:tool',color: '#02941fff'},
-			项目:{icon: 'codicon:github',color: '#039e8fff'},
+			云服务: { icon: 'mdi:cloud-outline', color: '#3af' },
+			开发运维: { icon: 'simple-icons:devbox', color: '#77f' },
+			工具: { icon: 'mynaui:tool', color: '#02941fff' },
+			项目: { icon: 'codicon:github', color: '#039e8fff' },
 		},
 		defaultCategoryIcon: 'ph:folder-bold',
 		/** 分类排序方式，键为排序字段，值为显示名称 */
@@ -63,7 +63,7 @@ export default defineAppConfig({
 			{
 				title: '说明',
 				items: [
-					
+
 					{ icon: 'ph:shield-bold', text: '隐私声明', url: '/info/privacy' },
 					{ icon: 'ph:info-bold', text: '免责声明', url: '/info/disclaimer' },
 					{ icon: 'ph:arrow-square-out-bold', text: '外链说明', url: '/info/about-link' },
@@ -72,7 +72,7 @@ export default defineAppConfig({
 			{
 				title: '信息',
 				items: [
-					{ icon: 'simple-icons:nuxtdotjs', text: 'Nuxt开源博客主题', url: 'https://github.com/L33Z22L11/blog-v3' },
+					{ icon: 'simple-icons:nuxtdotjs', text: '本站原主题', url: 'https://github.com/L33Z22L11/blog-v3' },
 					{ icon: 'ph:swatches-bold', text: '主题和组件文档', url: '/theme' },
 					{ icon: 'ph:certificate-bold', text: '陇ICP备2024006356号-2', url: 'https://beian.miit.gov.cn/' },
 				],

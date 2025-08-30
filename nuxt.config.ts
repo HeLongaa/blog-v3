@@ -17,7 +17,7 @@ export default defineNuxtConfig({
 				{ rel: 'icon', href: blogConfig.favicon },
 				{ rel: 'alternate', type: 'application/atom+xml', href: '/atom.xml' },
 				{ rel: 'preconnect', href: blogConfig.artalk.server },
-				{ rel: 'stylesheet', href: blogConfig.artalk.server+'/dist/Artalk.css' },
+				{ rel: 'stylesheet', href: `${blogConfig.artalk.server}/dist/Artalk.css` },
 				{ rel: 'stylesheet', href: 'https://lib.baomitu.com/KaTeX/0.16.9/katex.min.css' },
 				// 思源黑体 "Noto Sans SC", 思源宋体 "Noto Serif SC", "JetBrains Mono"
 				{ rel: 'preconnect', href: 'https://fonts.gstatic.cn', crossorigin: '' },
@@ -36,12 +36,12 @@ export default defineNuxtConfig({
 		},
 	},
 	nitro: {
-    routeRules: {
-      ...routeRules,
-      // 确保静态资源不被优化处理
-      '/assets/**': { headers: { 'Cache-Control': 'max-age=31536000' } },
-    }
-  },
+		routeRules: {
+			...routeRules,
+			// 确保静态资源不被优化处理
+			'/assets/**': { headers: { 'Cache-Control': 'max-age=31536000' } },
+		},
+	},
 	compatibilityDate: '2024-08-03',
 
 	components: [
@@ -159,9 +159,9 @@ ${packageJson.homepage}
 		ipx: {
 			modifiers: {
 				format: 'webp',
-				quality: 80
-			}
-		}
+				quality: 80,
+			},
+		},
 	},
 
 	robots: {

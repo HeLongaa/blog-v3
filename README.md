@@ -1,4 +1,4 @@
-# 纸鹿摸鱼处
+# 硅基漫游指南
 
 [![框架](https://img.shields.io/badge/框架-Nuxt-00DC82?logo=Nuxt.js)](https://nuxt.com/)
 [![CMS](https://img.shields.io/badge/CMS-Nuxt%20Content-00DC82?logo=Nuxt.js)](https://content.nuxt.com/)
@@ -7,38 +7,29 @@
 [![代码风格](https://img.shields.io/badge/代码风格-ESLint-4B32C3?logo=ESLint)](https://eslint.org/)
 [![代码风格](https://img.shields.io/badge/代码风格-Stylelint-263238?logo=Stylelint)](https://stylelint.io/)
 
-我的第三代个人博客，于 2024 年 8 月 11 日上线。
-
-> [!WARNING]
->
-> 修改本项目需要具备**前端开发**和**项目部署**能力。由于这是个人博客，代码经过深度定制，且可能会进行较大幅度的更新，建议您 Fork 后安心使用自己分支的版本；若需引入上游（本仓库）的新功能，建议重新 Fork 最新代码，以避免同步冲突。
->
-> 如果需要协助或有问题咨询，欢迎加入 QQ 群 169994096 讨论/闲聊，我会在空闲时尽力解答。
+主题基于**上游**[纸鹿摸鱼处](https://blog.zhilu.site/)大佬的主题开发，原主题链接[Github](https://github.com/L33Z22L11/blog-v3)
 
 ## 使用本主题的博客
 
 > v3.3 (不含) 之前使用 Nuxt 3 + Nuxt Content 2，更新依赖/删除 lcok 文件可能导致项目无法启动。
 
-| 博客名称                                    | 作者          | 对应上游版本 | 下游特色功能                   |
-| ------------------------------------------- | ------------- | ------------ | ------------------------------ |
-| **[纸鹿摸鱼处](https://blog.zhilu.site/)**  | **L33Z22L11** | **v3.4.1**   | (我是上游)                     |
-| [希乐博客](https://blog.xlenco.top/)        | Xlenco        | v3.4.0       | 最新评论                       |
-| [SteinsNote](https://blog.labmem.chat/)     | Labmem-00     | v3.1-241112  | 专栏                           |
-| [月空人](https://whbbit.cn/)                | Whbbit1999    | v3.3-250521  | 项目/博客/Snippets页           |
-| [地球驿站](https://blog.mugzx.top/)         | mugzx         | v3.4.0       | 设计风格统一                   |
-| [喵落阁](https://blog-v3.kemeow.top/)       | Kemeow815     | v3.2-250521  | 即刻+友圈+最新评论+游戏/番剧页 |
-| [梦爱吃鱼](https://blog.ruom.top/)          | JLinmr        | v3.2-250304  | 即刻+友圈+最新评论             |
-| [Mikuの极光星](https://blog.sotkg.com/)     | PaloMiku      | v3.4.0       | 设计风格统一                   |
-| [Shenley的存档点](https://blog.ykrazy.top/) | shenlye       | v3.4.0       | 游戏/番剧页                    |
-| [BiuXin-s Blog](https://zhilu.biuxin.com/)  | damizai       | v3.2-250304  | 即刻+友圈+最新评论             |
-| [液泡部落格](https://blog.vacu.top/)        | VacuolePaoo   | v3.4.0       | 一言                           |
-| [莫言小栈](https://www.myxz.top/)           | 661111        | v3.4.0       | 即刻+友圈+Heo友链轮播/Profile  |
-| [落憾](https://blog.enltlh.me/)             | LuoH-AN       | v3.4.0       | 即刻+标签tags                  |
-| [落尘up](https://www.luochen.chat/)         | luochenup     | v3.3.4       | 侧栏时间轴                     |
-
-## 特性
-
-[主题特性](https://blog.zhilu.site/theme) · [组件示例](https://blog.zhilu.site/previews/example)
+| 博客名称                               | 作者            | 对应上游版本 | 下游特色功能                |
+|------------------------------------|---------------| ------------ |-----------------------|
+| **[纸鹿摸鱼处](https://blog.zhilu.site/)** | **L33Z22L11** | **v3.4.1**   | (我是上游)                |
+| [希乐博客](https://blog.xlenco.top/)   | Xlenco        | v3.4.0       | 最新评论                  |
+| [SteinsNote](https://blog.labmem.chat/) | Labmem-00     | v3.1-241112  | 专栏                    |
+| [月空人](https://whbbit.cn/)          | Whbbit1999    | v3.3-250521  | 项目/博客/Snippets页       |
+| [地球驿站](https://blog.mugzx.top/)    | mugzx         | v3.4.0       | 设计风格统一                |
+| [喵落阁](https://blog-v3.kemeow.top/) | Kemeow815     | v3.2-250521  | 即刻+友圈+最新评论+游戏/番剧页     |
+| [梦爱吃鱼](https://blog.ruom.top/)     | JLinmr        | v3.2-250304  | 即刻+友圈+最新评论            |
+| [Mikuの极光星](https://blog.sotkg.com/) | PaloMiku      | v3.4.0       | 设计风格统一                |
+| [Shenley的存档点](https://blog.ykrazy.top/) | shenlye       | v3.4.0       | 游戏/番剧页                |
+| [BiuXin-s Blog](https://zhilu.biuxin.com/) | damizai       | v3.2-250304  | 即刻+友圈+最新评论            |
+| [液泡部落格](https://blog.vacu.top/)    | VacuolePaoo   | v3.4.0       | 一言                    |
+| [莫言小栈](https://www.myxz.top/)      | 661111        | v3.4.0       | 即刻+友圈+Heo友链轮播/Profile |
+| [落憾](https://blog.enltlh.me/)      | LuoH-AN       | v3.4.0       | 即刻+标签tags             |
+| [落尘up](https://www.luochen.chat/)  | luochenup     | v3.3.4       | 侧栏时间轴                 |
+| [硅基漫游指南](https://blog.helong.online/)        | HeLongaa      | v3.3.4       | 留言板+瞬间+朋友动态+artalk评论  |
 
 ## 目录结构
 
@@ -156,5 +147,5 @@ pnpm preview
 
 - 项目本体：[MIT](LICENSE)
 - 博客文章：[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hans)
-- 请完成必要的配置与修改后再部署项目，**不得使用“纸鹿”相关名称、Logo建立“镜像”网站或照搬文章内容而不标注来源**，否则我将设法与你联系。
-- 希望你在页脚保留此项目链接，助力开源传播。
+- 请完成必要的配置与修改后再部署项目，**不得使用“使用本主题的博客中的”相关名称、Logo建立“镜像”网站或照搬文章内容而不标注来源**，否则我将设法与你联系。
+- 继承开源精神，保护原作者权益，请在页脚保留此项目链接，助力开源传播。
