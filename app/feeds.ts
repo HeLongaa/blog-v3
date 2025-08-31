@@ -1,15 +1,16 @@
 import type { FeedGroup } from '~/types/feed'
-import { getFavicon, getGhAvatar, getGhIcon, getQqAvatar, QqAvatarSize } from './utils/img'
 import blogConfig from '~~/blog.config'
+import { getFavicon } from './utils/img'
 
 // 获取邻居数据的异步函数
 async function getNeighborsData() {
 	try {
-		const response = await fetch(blogConfig.data.api_endpoint+'/link_data.json')
-		if (!response.ok) throw new Error('Failed to fetch neighbors data')
-		
+		const response = await fetch(`${blogConfig.data.api_endpoint}/link_data.json`)
+		if (!response.ok)
+			throw new Error('Failed to fetch neighbors data')
+
 		const data = await response.json()
-		
+
 		return data.map((item: any) => ({
 			author: item.link_name,
 			desc: item.link_desc,
@@ -21,7 +22,8 @@ async function getNeighborsData() {
 			date: item.date.split(' ')[0], // 只取日期部分，去掉时间
 			comment: '',
 		}))
-	} catch (error) {
+	}
+	catch (error) {
 		console.error('Failed to fetch neighbors data:', error)
 		return []
 	}
@@ -54,12 +56,13 @@ export default async function getFeedGroups(): Promise<FeedGroup[]> {
 					avatar: getFavicon('www.nodeseek.com'),
 					date: '2025-08-29',
 				},
-				
+
 			],
 		},
 		{
 			name: '我的邻居',
 			desc: '友情需要常联系～～',
+			// eslint-disable-next-line command/command
 			// @keep-sorted { "keys": ["date"] }
 			entries: neighborsEntries,
 		},

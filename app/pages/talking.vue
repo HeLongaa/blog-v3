@@ -9,7 +9,7 @@ useSeoMeta({
 })
 
 const layoutStore = useLayoutStore()
-layoutStore.setAside(['blog-stats', 'blog-log', 'friend-posts'])
+layoutStore.setAside(['blog-stats', 'friend-posts', 'blog-tech', 'comm-group'])
 
 const dataCacheStore = useDataCacheStore()
 
@@ -196,13 +196,14 @@ onUnmounted(() => {
 
 <template>
 <div class="moments-container">
-	<div class="moments-header">
-		<h1>
-			<Icon name="ph:lightning-bold" />
+	<header class="moments-header">
+		<h3 class="moments-title">
 			瞬间
-		</h1>
-		<p>记录生活的美好瞬间</p>
-	</div>
+		</h3>
+		<p class="moments-desc">
+			生活需要仪式感，保持记录可以让人变得自律。
+		</p>
+	</header>
 
 	<div class="moments-list">
 		<!-- 初始加载状态 -->
@@ -323,7 +324,7 @@ onUnmounted(() => {
 .moments-container {
   max-width: 800px;
   margin: 0 auto;
-  padding: 2rem 1rem;
+  padding: 1rem 1rem;
 
   @media (max-width: 768px) {
     padding: 1rem 0.5rem;
@@ -331,29 +332,31 @@ onUnmounted(() => {
 }
 
 .moments-header {
+  container-type: inline-size;
+  margin: 2rem 1rem;
+}
+
+.moments-title {
+  position: sticky;
+  top: 0;
+  margin-bottom: -0.3em;
+  z-index: -1;
+  font: 800 5em/1 var(--font-stroke-free);
   text-align: center;
-  margin-bottom: 3rem;
+  color: transparent;
+  -webkit-text-stroke: 1px var(--c-text-3);
+  mask-image: linear-gradient(#fff 50%, transparent);
+  transition: color 0.2s;
+}
 
-  h1 {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: var(--c-text-1);
-    margin-bottom: 0.5rem;
+.moments-title::selection,
+.moments-header:hover .moments-title {
+  color: var(--c-text-3);
+}
 
-    @media (max-width: 768px) {
-      font-size: 2rem;
-    }
-  }
-
-  p {
-    color: var(--c-text-2);
-    font-size: 1.1rem;
-    margin: 0;
-  }
+.moments-desc {
+  text-align: center;
+  color: var(--c-text-2);
 }
 
 .moments-list {

@@ -13,7 +13,7 @@ interface FriendPost {
 }
 
 const layoutStore = useLayoutStore()
-layoutStore.setAside(['blog-stats', 'comm-group'])
+layoutStore.setAside(['blog-stats', 'blog-log', 'blog-tech', 'comm-group'])
 
 const dataCacheStore = useDataCacheStore()
 
@@ -150,14 +150,14 @@ onMounted(() => {
 
 <template>
 <div class="friends-page">
-	<div class="page-header">
-		<h1 class="text-creative">
+	<header class="f-header">
+		<h3 class="f-title">
 			朋友动态
-		</h1>
-		<p class="page-desc">
+		</h3>
+		<p class="f-desc">
 			来自朋友们的最新文章动态
 		</p>
-	</div>
+	</header>
 
 	<div class="posts-container">
 		<!-- 初始加载状态 -->
@@ -278,26 +278,32 @@ onMounted(() => {
   }
 }
 
-.page-header {
+.f-header {
+  container-type: inline-size;
+  margin: 2rem 1rem;
+}
+
+.f-title {
+  position: sticky;
+  top: 0;
+  margin-bottom: -0.3em;
+  z-index: -1;
+  font: 800 5em/1 var(--font-stroke-free);
   text-align: center;
-  margin-bottom: 3rem;
+  color: transparent;
+  -webkit-text-stroke: 1px var(--c-text-3);
+  mask-image: linear-gradient(#fff 50%, transparent);
+  transition: color 0.2s;
+}
 
-  h1 {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: var(--c-text-1);
-    margin-bottom: 0.5rem;
+.f-title::selection,
+.f-header:hover .f-title {
+  color: var(--c-text-3);
+}
 
-    @media (max-width: 768px) {
-      font-size: 2rem;
-    }
-  }
-
-  .page-desc {
-    color: var(--c-text-2);
-    font-size: 1.1rem;
-    margin: 0;
-  }
+.f-desc {
+  text-align: center;
+  color: var(--c-text-2);
 }
 
 .loading-container,

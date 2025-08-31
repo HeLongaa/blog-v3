@@ -4,7 +4,7 @@ import getFeedGroups from '~/feeds'
 
 const appConfig = useAppConfig()
 const layoutStore = useLayoutStore()
-layoutStore.setAside([])
+layoutStore.setAside(['blog-stats', 'friend-posts', 'blog-tech', 'comm-group'])
 
 const { data: postLink } = await useAsyncData('/link', () => queryCollection('content').path('/link').first())
 const feeds = await getFeedGroups()

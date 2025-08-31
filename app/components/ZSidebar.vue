@@ -127,7 +127,7 @@ const keycut = computed(() => navigator?.userAgent.includes('Mac OS') ? '⌘K' :
 		content: "⦁";
 		width: 1em;
 		text-align: center;
-		color: var(--c-text-3);
+		color: var(--c-primary);
 	}
 
 	.iconify {

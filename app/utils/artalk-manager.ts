@@ -1,8 +1,8 @@
 /**
  * Artalk 评论系统管理器
- * 确保全局只有一个Artalk实例，避免多页面冲突
+ * - 全局单例
+ * - 支持 init（完整评论） / loadCountWidget（纯计数）
  */
-
 interface ArtalkOptions {
 	el: string
 	pageKey: string
@@ -13,10 +13,18 @@ interface ArtalkOptions {
 	darkMode?: boolean
 }
 
+interface CountWidgetOptions {
+	server?: string
+	site?: string
+	pvEl?: string
+	countEl?: string
+	statPageKeyAttr?: string
+}
+
 class ArtalkManager {
 	private static instance: ArtalkManager
 	private artalkInstance: any = null
-	private currentPageKey: string = ''
+	private currentPageKey = ''
 
 	private constructor() {}
 
@@ -27,77 +35,96 @@ class ArtalkManager {
 		return ArtalkManager.instance
 	}
 
+	/* ---------- 完整评论 ---------- */
 	public async init(options: ArtalkOptions): Promise<void> {
-		if (this.currentPageKey === options.pageKey && this.artalkInstance) {
+		if (this.currentPageKey === options.pageKey && this.artalkInstance)
 			return
-		}
-
 		this.destroy()
 		await this.waitForArtalk()
-		let retryCount = 0
-		const maxRetries = 10
-
-		while (retryCount < maxRetries) {
-			const artalkEl = document.getElementById(options.el.replace('#', ''))
-			// @ts-expect-error window上有Artalk实例
-			if (artalkEl && window.Artalk) {
-				try {
-					// @ts-expect-error Artalk类型
-					this.artalkInstance = window.Artalk.init(options)
-					this.currentPageKey = options.pageKey
-					return
-				}
-				catch (error) {
-					console.error('Artalk初始化失败:', error)
-					throw error
-				}
+		this.retryUntil(() => {
+			const el = document.getElementById(options.el.replace('#', ''))
+			/// @ts-expect-error 导入ar
+			if (el && window.Artalk) {
+				// eslint-disable-next-line ts/ban-ts-comment
+				// @ts-expect-error
+				this.artalkInstance = window.Artalk.init(options)
+				this.currentPageKey = options.pageKey
+				return true
 			}
-
-			await new Promise(resolve => setTimeout(resolve, 100))
-			retryCount++
-		}
-
-		throw new Error(`Artalk元素或脚本未找到`)
+			return false
+		})
 	}
 
+	/* ---------- 纯计数器 ---------- */
+	public async loadCountWidget(opts: CountWidgetOptions): Promise<void> {
+		await this.waitForArtalk()
+		this.retryUntil(() => {
+			// @ts-expect-error 加载计数
+			if (window.Artalk?.loadCountWidget) {
+				// eslint-disable-next-line ts/ban-ts-comment
+				// @ts-expect-error
+				window.Artalk.loadCountWidget(opts)
+				return true
+			}
+			return false
+		})
+	}
+
+	/* ---------- 工具方法 ---------- */
 	public destroy(): void {
-		if (this.artalkInstance) {
-			try {
-				this.artalkInstance.destroy()
-			}
-			catch (error) {
-			}
-			this.artalkInstance = null
-			this.currentPageKey = ''
+		if (this.artalkInstance?.destroy) {
+			// eslint-disable-next-line style/max-statements-per-line
+			try { this.artalkInstance.destroy() }
+			catch {}
 		}
+		this.artalkInstance = null
+		this.currentPageKey = ''
 	}
 
 	public setDarkMode(isDark: boolean): void {
-		if (this.artalkInstance && this.artalkInstance.setDarkMode) {
-			this.artalkInstance.setDarkMode(isDark)
-		}
+		this.artalkInstance?.setDarkMode?.(isDark)
 	}
 
-	private waitForArtalk(): Promise<void> {
-		return new Promise((resolve) => {
-			// @ts-expect-error window上有Artalk实例
-			if (window.Artalk) {
-				resolve()
-				return
-			}
+	private async loadScript(): Promise<void> {
+		// 1️⃣ 服务器端直接返回
+		if (typeof window === 'undefined')
+			return
 
-			const checkArtalk = () => {
-				// @ts-expect-error window上有Artalk实例
-				if (window.Artalk) {
-					resolve()
-				}
-				else {
-					setTimeout(checkArtalk, 100)
-				}
-			}
+		// 2️⃣ 已经加载过
+		if ((window as any).Artalk)
+			return
 
-			setTimeout(checkArtalk, 100)
+		return new Promise<void>((resolve, reject) => {
+			const script = document.createElement('script')
+			script.src = 'https://your-cdn.com/Artalk.js' // 换成你自己的地址
+			script.async = true
+			script.onload = () => resolve()
+			script.onerror = () => reject(new Error('Artalk 脚本加载失败'))
+			document.head.appendChild(script)
 		})
+	}
+
+	private async waitForArtalk(): Promise<void> {
+		// 服务器端直接返回
+		if (typeof window === 'undefined')
+			return
+
+		await this.loadScript()
+		return new Promise<void>((res) => {
+			const check = () =>
+				(window as any).Artalk ? res() : setTimeout(check, 50)
+			check()
+		})
+	}
+
+	private async retryUntil(fn: () => boolean, max = 50): Promise<void> {
+		let i = 0
+		while (i++ < max) {
+			if (fn())
+				return
+			await new Promise(r => setTimeout(r, 100))
+		}
+		throw new Error('Artalk 元素或方法未就绪')
 	}
 }
 

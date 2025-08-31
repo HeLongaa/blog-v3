@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import type ArticleProps from '~/types/article'
+import { onMounted, watch } from 'vue'
+import blogConfig from '~~/blog.config'
+import ArtalkManager from '~/utils/artalk-manager'
 
-const props = defineProps<{ useUpdated?: boolean } & ArticleProps>()
+const props = defineProps<{ useUpdated?: boolean, to?: string } & ArticleProps>()
 
 const appConfig = useAppConfig()
 
@@ -10,10 +13,30 @@ const showAllDate = isTimeDiffSignificant(props.date, props.updated)
 const categoryLabel = computed(() => props.categories?.[0])
 const categoryColor = computed(() => appConfig.article.categories[categoryLabel.value!]?.color)
 const categoryIcon = computed(() => getCategoryIcon(categoryLabel.value))
+const pageKey = computed(() => props.to || props.path || '')
+onMounted(async () => {
+	// 首次进入
+	await loadArtalk()
+})
+
+// 路由切换后 pageKey 变了再执行
+watch(pageKey, loadArtalk, { immediate: false })
+async function loadArtalk() {
+	if (process.client) {
+		const artalk = ArtalkManager.getInstance()
+		await artalk.loadCountWidget({
+			server: blogConfig.artalk.server,
+			site: blogConfig.artalk.site,
+			pvEl: `.artalk-pv-count[data-page-key="${pageKey.value}"]`,
+			countEl: `.artalk-comment-count[data-page-key="${pageKey.value}"]`,
+			statPageKeyAttr: 'data-page-key',
+		})
+	}
+}
 </script>
 
 <template>
-<ZRawLink class="article-card card">
+<ZRawLink class="article-card card" :to="to">
 	<NuxtImg v-if="image" class="article-cover" :src="image" :alt="title" />
 	<article>
 		<h2 class="article-title text-creative">
@@ -60,6 +83,22 @@ const categoryIcon = computed(() => getCategoryIcon(categoryLabel.value))
 				<Icon name="ph:paragraph-bold" />
 				{{ formatNumber(readingTime?.words) }}字
 			</span>
+
+			<span>
+				<Icon name="ph:eyes-bold" />
+				<span
+					class="artalk-pv-count"
+					:data-page-key="pageKey"
+				>···</span>
+			</span>
+
+			<span>
+				<Icon name="ph:chat-centered-text-bold" />
+				<span
+					class="artalk-comment-count"
+					:data-page-key="pageKey"
+				>···</span>
+			</span>
 		</div>
 	</article>
 </ZRawLink>
@@ -87,7 +126,10 @@ const categoryIcon = computed(() => getCategoryIcon(categoryLabel.value))
 	gap: 0.5em clamp(1em, 5%, 1.5em);
 	font-size: 0.8em;
 	color: var(--c-text-2);
-
+  .artalk-pv-count,
+  .artalk-comment-count {
+    margin-left: 0.3rem;
+  }
 	&:empty {
 		display: none;
 	}

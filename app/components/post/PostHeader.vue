@@ -58,6 +58,18 @@ const { copy, copied } = useCopy(shareText)
 				<Icon name="ph:paragraph-bold" />
 				{{ formatNumber(readingTime?.words) }} 字
 			</span>
+			<span>
+				<Icon name="ph:eyes-bold" /> 浏览量:
+				<span class="artalk-pv-count">
+					...
+				</span>
+			</span>
+			<span>
+				<Icon name="ph:chat-centered-text-bold" /> 评论:
+				<span class="artalk-comment-count">
+					...
+				</span>
+			</span>
 		</div>
 	</div>
 
