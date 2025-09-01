@@ -48,7 +48,7 @@ layoutStore.setAside(['blog-stats', 'friend-posts', 'blog-tech', 'comm-group'])
 .messages-page {
   max-width: 1000px;
   margin: 0 auto;
-  padding: 2rem 1rem;
+  padding: 0rem 1rem;
 
   @media (max-width: 768px) {
     padding: 1rem 0.5rem;

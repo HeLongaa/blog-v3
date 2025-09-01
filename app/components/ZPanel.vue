@@ -43,9 +43,9 @@ useEventListener('keydown', (event) => {
 	font-size: 1.4rem;
 	z-index: 100;
 
-	@media (max-height: $breakpoint-phone) {
-		display: flex;
-	}
+	//@media (max-height: $breakpoint-phone) {
+	//	display: flex;
+	//}
 
 	@media (min-width: $breakpoint-widescreen) {
 		display: none;

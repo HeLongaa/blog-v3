@@ -324,7 +324,7 @@ onUnmounted(() => {
 .moments-container {
   max-width: 800px;
   margin: 0 auto;
-  padding: 1rem 1rem;
+  padding: 0rem 1rem;
 
   @media (max-width: 768px) {
     padding: 1rem 0.5rem;
@@ -370,7 +370,7 @@ onUnmounted(() => {
   border: 1px solid var(--c-border);
   display: flex;
   flex-direction: column;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.6rem;
   padding: 1.5rem;
   position: relative;
   transition: all 0.3s ease;
@@ -378,14 +378,13 @@ onUnmounted(() => {
   background: var(--ld-bg-card);
 
   &:hover {
-    border-color: var(--c-brand);
     box-shadow: 0 8px 25px rgba(var(--c-brand-rgb), 0.15);
     transform: translateY(-2px);
   }
 
-  &.is-top {
-    background: var(--ld-bg-card);
-  }
+  // &.is-top {
+  //   background: var(--ld-bg-card);
+  // }
 
   @media (max-width: 768px) {
     padding: 1rem;
@@ -657,7 +656,7 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   gap: 0.75rem;
-  padding: 3rem 2rem;
+  // padding: 3rem 2rem;
   color: var(--c-text-2);
   font-size: 1.1rem;
 
@@ -738,66 +737,5 @@ onUnmounted(() => {
   50% {
     opacity: 0.6;
   }
-}
-
-// 返回顶部按钮
-.back-to-top {
-  position: fixed;
-  bottom: 2rem;
-  right: 2rem;
-  width: 52px;
-  height: 52px;
-  background: var(--c-bg-soft);
-  border: 1px solid var(--c-border);
-  color: var(--c-text-1);
-  border-radius: 12px;
-  cursor: pointer;
-  font-size: 1.2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  backdrop-filter: blur(8px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  z-index: 100;
-
-  &:hover {
-    background: var(--c-brand);
-    color: white;
-    border-color: var(--c-brand);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-  }
-
-  &:active {
-    transform: translateY(-1px);
-  }
-
-  svg {
-    transition: transform 0.2s ease;
-  }
-
-  &:hover svg {
-    transform: translateY(-1px);
-  }
-
-  @media (max-width: 768px) {
-    bottom: 1.5rem;
-    right: 1.5rem;
-    width: 48px;
-    height: 48px;
-    font-size: 1.1rem;
-  }
-}
-
-// 过渡动画
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
 }
 </style>

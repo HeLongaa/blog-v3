@@ -46,6 +46,7 @@ export default defineAppConfig({
 		iconNav: [
 			{ icon: 'ph:house-bold', text: '个人主页', url: blogConfig.author.homepage },
 			{ icon: 'ph:github-logo-bold', text: 'GitHub: HeLongaa', url: 'https://github.com/HeLongaa' },
+			{ icon: 'ph:telegram-logo-bold', text: 'Telegram: @BenjaminSmith', url: 'https://t.me/Benjamin_Smith00' },
 			{ icon: 'simple-icons:zhihu', text: '知乎: 沉渊', url: 'https://www.zhihu.com/people/yu-luo-wu-sheng-73-99' },
 			{ icon: 'ph:rss-simple-bold', text: '本站订阅', url: '/atom.xml' },
 			// { icon: 'ph:subway-bold', text: '开往', url: 'https://www.travellings.cn/go-by-clouds.html' },

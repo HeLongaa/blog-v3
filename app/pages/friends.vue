@@ -271,7 +271,7 @@ onMounted(() => {
 .friends-page {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem 1rem;
+  padding: 0 1rem;
 
   @media (max-width: 768px) {
     padding: 1rem 0.5rem;
@@ -313,7 +313,7 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   gap: 0.75rem;
-  padding: 3rem 2rem;
+  // padding: 3rem 2rem;
   color: var(--c-text-2);
   font-size: 1.1rem;
 
@@ -327,11 +327,7 @@ onMounted(() => {
 .post-grid {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-
-  @media (max-width: 768px) {
-    gap: 0.75rem;
-  }
+  gap: 0.6rem;
 }
 
 .post-card {
@@ -346,7 +342,6 @@ onMounted(() => {
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
-    border-color: var(--c-brand);
 
     .post-title {
       color: var(--c-brand);

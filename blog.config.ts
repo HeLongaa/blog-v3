@@ -57,6 +57,7 @@ const blogConfig = {
 	scripts: [
 		// Artalk 评论系统
 		{ src: `https://artalk.helong.online/dist/Artalk.js`, defer: true },
+		{ src: `https://cdn.jsdelivr.net/npm/iconify-icon@3.0.0/dist/iconify-icon.min.js`, defer: true },
 	],
 
 	data: {

@@ -51,6 +51,7 @@ defineProps<{
 	&.dim {
 		opacity: 0.3;
 		transition: opacity 0.2s;
+    margin-top: 1rem;
 
 		#z-aside:hover &, #z-aside.show & {
 			opacity: 1;
