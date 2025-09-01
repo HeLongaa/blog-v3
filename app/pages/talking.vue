@@ -288,7 +288,7 @@ onUnmounted(() => {
 						</div>
 					</div>
 					<button class="comment-btn" @click="scrollToComment(item.content)">
-						<Icon name="ph:chats-bold" />
+						<Icon name="hugeicons:comment-01" />
 					</button>
 				</div>
 			</div>
@@ -364,27 +364,20 @@ onUnmounted(() => {
 }
 
 .moment-item {
-  animation: float-in 0.6s ease-out backwards;
-  animation-delay: var(--delay);
-  border-radius: 16px;
-  border: 1px solid var(--c-border);
+  border-radius: 0.8rem;
+  box-shadow: 0 0.1em 0.2em var(--ld-shadow);
   display: flex;
   flex-direction: column;
   margin-bottom: 0.6rem;
-  padding: 1.5rem;
+  padding: .9rem;
   position: relative;
   transition: all 0.3s ease;
-  min-height: 200px;
   background: var(--ld-bg-card);
-
+  animation: float-in 0.2s var(--delay) backwards;
   &:hover {
-    box-shadow: 0 8px 25px rgba(var(--c-brand-rgb), 0.15);
+    box-shadow: 0 0.5em 1em var(--ld-shadow);
     transform: translateY(-2px);
   }
-
-  // &.is-top {
-  //   background: var(--ld-bg-card);
-  // }
 
   @media (max-width: 768px) {
     padding: 1rem;
@@ -428,8 +421,8 @@ onUnmounted(() => {
   gap: 1rem;
 
   .avatar {
-    width: 50px;
-    height: 50px;
+    width: 42px;
+    height: 42px;
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid var(--c-border);
@@ -450,11 +443,10 @@ onUnmounted(() => {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    font-size: 1.1rem;
 
     .verified {
       color: var(--c-primary);
-      font-size: 1.2em;
+      font-size: 1.1em;
     }
 
     @media (max-width: 768px) {
@@ -470,14 +462,13 @@ onUnmounted(() => {
 }
 
 .moment-content {
-  min-height: 1.5rem; /* 确保没有图片时也有基本高度 */
+  min-height: 1.5rem;
 
   .content-text {
-    margin: 1rem 1rem 1rem .5rem;
+    margin: .8rem 1rem 1rem .5rem;
     color: var(--c-text-1);
-    line-height: 1.7;
     white-space: pre-wrap;
-    font-size: 1.05rem;
+    font-size: 1rem;
 
     @media (max-width: 768px) {
       font-size: 1rem;
@@ -494,8 +485,7 @@ onUnmounted(() => {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 12px;
-  margin: 1rem 0 0.5rem 0; /* 统一图片区域的边距 */
-  padding: 0.5rem 0; /* 添加内边距以保持一致的视觉间距 */
+  margin-left: 0.6rem;
 
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
@@ -507,13 +497,9 @@ onUnmounted(() => {
     overflow: hidden;
     border-radius: 12px;
     display: block;
+    width: 40%;
     transition: transform 0.3s ease;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-
-    &:hover {
-      transform: scale(1.02);
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-    }
   }
 
   .grid-img {
@@ -531,7 +517,6 @@ onUnmounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 0.75rem;
   border-top: 1px solid var(--c-border-soft);
   margin-top: auto; /* 让底部区域自动推到底部 */
 
@@ -575,8 +560,8 @@ onUnmounted(() => {
 }
 
 .comment-btn {
-  background: none;
-  border: 1px solid var(--c-border);
+  background-color: var(--c-bg-2);;
+  //border: 1px solid var(--c-border);
   border-radius: 8px;
   padding: 0.5rem 0.75rem;
   cursor: pointer;
@@ -586,12 +571,6 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 0.25rem;
-
-  &:hover {
-    color: var(--c-brand);
-    border-color: var(--c-brand);
-    background: var(--c-brand-light);
-  }
 
   @media (max-width: 768px) {
     width: 100%;

@@ -332,19 +332,19 @@ onMounted(() => {
 
 .post-card {
   background: var(--c-bg-soft);
-  border: 1px solid var(--c-border);
-  border-radius: 12px;
+  border-radius: 0.8rem;
   overflow: hidden;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   animation: fade-in 0.6s ease-out backwards;
   animation-delay: var(--delay);
+  box-shadow: 0 0.1em 0.2em var(--ld-shadow);
 
   &:hover {
+    box-shadow: 0 0.5em 1em var(--ld-shadow);
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
 
     .post-title {
-      color: var(--c-brand);
+      color: var(--c-primary);
     }
   }
 }
