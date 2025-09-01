@@ -334,7 +334,7 @@ onMounted(() => {
   background: var(--c-bg-soft);
   border-radius: 0.8rem;
   overflow: hidden;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s;
   animation: fade-in 0.6s ease-out backwards;
   animation-delay: var(--delay);
   box-shadow: 0 0.1em 0.2em var(--ld-shadow);
@@ -391,7 +391,7 @@ onMounted(() => {
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid var(--c-border);
-  transition: border-color 0.3s ease;
+  transition: border-color 0.2s ease;
 
   @media (max-width: 768px) {
     width: 40px;
@@ -507,7 +507,7 @@ onMounted(() => {
   cursor: pointer;
   font-size: 0.95rem;
   font-weight: 500;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 
   &:hover {
     background: var(--c-brand-dark);

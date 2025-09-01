@@ -77,8 +77,9 @@ onUnmounted(() => {
 
 	/* 自定义 Artalk 评论样式 */
 	.atk-main-editor {
-		border-radius: 1rem !important;
+		border-radius: 0.8rem !important;
     background-color: var(--ld-bg-card);
+    box-shadow: 0 0.1em 0.2em var(--ld-shadow);
 	}
   .atk-textarea{
     background-color: var(--ld-bg-card);
@@ -87,13 +88,20 @@ onUnmounted(() => {
 	.atk-send-btn {
 		background-color: var(--c-primary) !important;
 		border-radius: 16px !important;
+    transition: all 0.2s;
+
+    &:hover {
+      box-shadow: 0 0.5em 1em var(--ld-shadow);
+      transform: translateY(-2px);
+    }
 	}
 
 	/* 调整评论容器样式 */
 	.atk-comment-wrap {
 		margin: 16px 0;
 		background-color: var(--ld-bg-card);;
-		border-radius: 1rem;
+		border-radius: 0.8rem;
+    box-shadow: 0 0.1em 0.2em var(--ld-shadow);
 	}
 
 	/* 评论内部padding */
@@ -193,16 +201,8 @@ onUnmounted(() => {
 
 		.atk-main-editor {
 			background-color: var(--c-bg-2) !important;
-			border-color: var(--c-border) !important;
+      box-shadow: 0 0.1em 0.2em var(--ld-shadow);
 			color: var(--c-text-1) !important;
-		}
-
-		.atk-send-btn {
-			background-color: var(--c-brand) !important;
-
-			&:hover {
-				background-color: var(--c-brand-light) !important;
-			}
 		}
 
 		.atk-content p {

@@ -371,7 +371,7 @@ onUnmounted(() => {
   margin-bottom: 0.6rem;
   padding: .9rem;
   position: relative;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   background: var(--ld-bg-card);
   animation: float-in 0.2s var(--delay) backwards;
   &:hover {
@@ -498,7 +498,7 @@ onUnmounted(() => {
     border-radius: 12px;
     display: block;
     width: 40%;
-    transition: transform 0.3s ease;
+    transition: transform 0.2s ease;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
 
@@ -550,7 +550,7 @@ onUnmounted(() => {
   font-size: 0.8rem;
   font-weight: 500;
   border: 1px solid var(--c-border-soft);
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 
   &:hover {
     background: var(--c-brand-light);
@@ -561,16 +561,19 @@ onUnmounted(() => {
 
 .comment-btn {
   background-color: var(--c-bg-2);;
-  //border: 1px solid var(--c-border);
   border-radius: 8px;
   padding: 0.5rem 0.75rem;
   cursor: pointer;
   font-size: 1.1rem;
   color: var(--c-text-2);
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   gap: 0.25rem;
+  &:hover {
+    background: var(--c-primary);
+    color: var(--c-bg);
+  }
 
   @media (max-width: 768px) {
     width: 100%;
