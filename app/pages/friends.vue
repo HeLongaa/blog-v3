@@ -313,7 +313,7 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   gap: 0.75rem;
-  // padding: 3rem 2rem;
+  padding: 1rem;
   color: var(--c-text-2);
   font-size: 1.1rem;
 

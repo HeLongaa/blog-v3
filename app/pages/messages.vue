@@ -93,14 +93,14 @@ layoutStore.setAside(['blog-stats', 'friend-posts', 'blog-tech', 'comm-group'])
 
 .welcome-card {
   background: var(--ld-bg-card);
-  border: 1px solid var(--c-border);
-  border-radius: 16px;
+  border-radius: 0.8rem;
   padding: 1.5rem 2rem;
   display: flex;
   gap: 1.5rem;
   align-items: center;
   transition: all 0.3s ease;
   margin: 1rem;
+  box-shadow: 0 .1em .2em var(--ld-shadow);
 
   @media (max-width: 768px) {
     flex-direction: column;
