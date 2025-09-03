@@ -132,7 +132,7 @@ function loadMore() {
 
 // 滚动加载
 // eslint-disable-next-line unused-imports/no-unused-vars
-const { arrivedState, y: scrollY } = useScroll(window, {
+const { arrivedState} = useScroll(window, {
 	offset: { bottom: 100 },
 })
 
@@ -149,135 +149,121 @@ onMounted(() => {
 </script>
 
 <template>
-<div class="friends-page">
-	<header class="f-header">
-		<h3 class="f-title">
-			朋友动态
-		</h3>
-		<p class="f-desc">
-			来自朋友们的最新文章动态
-		</p>
-	</header>
+<header class="f-header">
+	<h3 class="f-title">
+		朋友动态
+	</h3>
+	<p class="f-desc">
+		来自朋友们的最新文章动态
+	</p>
+</header>
 
-	<div class="posts-container">
-		<!-- 初始加载状态 -->
-		<div v-if="initialLoading">
-			<div class="loading-container">
-				<Icon name="ph:circle-notch" class="loading-icon" />
-				<span>正在加载朋友动态...</span>
-			</div>
+<div class="posts-container">
+	<!-- 初始加载状态 -->
+	<div v-if="initialLoading">
+		<div class="loading-container">
+			<Icon name="ph:circle-notch" class="loading-icon" />
+			<span>正在加载朋友动态...</span>
+		</div>
 
-			<!-- 骨架屏 -->
-			<div class="skeleton-container">
-				<div v-for="i in 3" :key="i" class="skeleton-post">
-					<div class="skeleton-header">
-						<div class="skeleton-avatar" />
-						<div class="skeleton-info">
-							<div class="skeleton-name" />
-							<div class="skeleton-domain" />
-						</div>
+		<!-- 骨架屏 -->
+		<div class="skeleton-container">
+			<div v-for="i in 3" :key="i" class="skeleton-post">
+				<div class="skeleton-header">
+					<div class="skeleton-avatar" />
+					<div class="skeleton-info">
+						<div class="skeleton-name" />
+						<div class="skeleton-domain" />
 					</div>
-					<div class="skeleton-content">
-						<div class="skeleton-title" />
-						<div class="skeleton-text" />
-						<div class="skeleton-text short" />
-					</div>
+				</div>
+				<div class="skeleton-content">
+					<div class="skeleton-title" />
+					<div class="skeleton-text" />
+					<div class="skeleton-text short" />
 				</div>
 			</div>
 		</div>
+	</div>
 
-		<!-- 文章列表 -->
-		<div v-else class="posts-list">
-			<TransitionGroup name="post" tag="div" class="post-grid">
-				<article
-					v-for="(post, index) in displayedPosts"
-					:key="`${post.domain}-${post.title}-${index}`"
-					class="post-card"
-					:style="{ '--delay': `${(index % pageSize) * 0.05}s` }"
+	<!-- 文章列表 -->
+	<div v-else class="posts-list">
+		<TransitionGroup name="post" tag="div" class="post-grid">
+			<article
+				v-for="(post, index) in displayedPosts"
+				:key="`${post.domain}-${post.title}-${index}`"
+				class="post-card"
+				:style="{ '--delay': `${(index % pageSize) * 0.05}s` }"
+			>
+				<a
+					:href="post.link"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="post-link"
 				>
-					<a
-						:href="post.link"
-						target="_blank"
-						rel="noopener noreferrer"
-						class="post-link"
-					>
-						<div class="post-main">
-							<div class="post-header">
-								<img
-									:src="getFavicon(post.domain)"
-									:alt="`${post.author} avatar`"
-									class="author-avatar"
-									loading="lazy"
-									@error="(e: Event) => {
-										const img = e.target as HTMLImageElement;
-										if (img && img.src.includes('site-img.helong.online')) {
-											img.src = `https://api.jiangcheng.site/api/favicon?url=${post.domain}`
-										}
-										else if (img && img.src.includes('api.jiangcheng.site')) {
-											img.src = '/favicon.ico'
-										}
-									}"
-								>
-								<div class="author-info">
-									<div class="author-details">
-										<h3 class="author-name">{{ decodeHtmlEntities(post.author) }}</h3>
-										<p class="post-domain">{{ post.domain }}</p>
-									</div>
+					<div class="post-main">
+						<div class="post-header">
+							<img
+								:src="getFavicon(post.domain)"
+								:alt="`${post.author} avatar`"
+								class="author-avatar"
+								loading="lazy"
+								@error="(e: Event) => {
+									const img = e.target as HTMLImageElement;
+									if (img && img.src.includes('site-img.helong.online')) {
+										img.src = `https://api.jiangcheng.site/api/favicon?url=${post.domain}`
+									}
+									else if (img && img.src.includes('api.jiangcheng.site')) {
+										img.src = '/favicon.ico'
+									}
+								}"
+							>
+							<div class="author-info">
+								<div class="author-details">
+									<h3 class="author-name">{{ decodeHtmlEntities(post.author) }}</h3>
+									<p class="post-domain">{{ post.domain }}</p>
 								</div>
-							</div>
-
-							<div class="post-content">
-								<h2 class="post-title">{{ decodeHtmlEntities(post.title) }}</h2>
-								<p v-if="post.content" class="post-excerpt">
-									{{ stripHtmlAndDecode(post.content).substring(0, 150) }}{{ post.content.length > 150 ? '...' : '' }}
-								</p>
 							</div>
 						</div>
 
-						<time class="post-date">{{ formatDate(post.date) }}</time>
-					</a>
-				</article>
-			</TransitionGroup>
-		</div>
+						<div class="post-content">
+							<h2 class="post-title">{{ decodeHtmlEntities(post.title) }}</h2>
+							<p v-if="post.content" class="post-excerpt">
+								{{ stripHtmlAndDecode(post.content).substring(0, 150) }}{{ post.content.length > 150 ? '...' : '' }}
+							</p>
+						</div>
+					</div>
 
-		<!-- 加载更多 -->
-		<div v-if="loading && !initialLoading" class="loading-more">
-			<Icon name="ph:circle-notch" class="loading-icon" />
-			<span>加载更多...</span>
-		</div>
-
-		<!-- 没有更多 -->
-		<div v-if="!hasMore && displayedPosts.length > 0" class="no-more">
-			<Icon name="ph:check-circle-bold" />
-			<span>已加载全部动态</span>
-		</div>
-
-		<!-- 空状态 -->
-		<div v-if="!initialLoading && !loading && displayedPosts.length === 0" class="empty-state">
-			<Icon name="ph:smiley-sad" />
-			<p>暂时没有朋友动态</p>
-			<button class="retry-btn" @click="loadAllPosts(true)">
-				<Icon name="ph:arrow-clockwise-bold" />
-				重新加载
-			</button>
-		</div>
+					<time class="post-date">{{ formatDate(post.date) }}</time>
+				</a>
+			</article>
+		</TransitionGroup>
 	</div>
 
-	<!-- 返回顶部 -->
+	<!-- 加载更多 -->
+	<div v-if="loading && !initialLoading" class="loading-more">
+		<Icon name="ph:circle-notch" class="loading-icon" />
+		<span>加载更多...</span>
+	</div>
+
+	<!-- 没有更多 -->
+	<div v-if="!hasMore && displayedPosts.length > 0" class="no-more">
+		<Icon name="ph:check-circle-bold" />
+		<span>已加载全部动态</span>
+	</div>
+
+	<!-- 空状态 -->
+	<div v-if="!initialLoading && !loading && displayedPosts.length === 0" class="empty-state">
+		<Icon name="ph:smiley-sad" />
+		<p>暂时没有朋友动态</p>
+		<button class="retry-btn" @click="loadAllPosts(true)">
+			<Icon name="ph:arrow-clockwise-bold" />
+			重新加载
+		</button>
+	</div>
 </div>
 </template>
 
 <style lang="scss" scoped>
-.friends-page {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 1rem;
-
-  @media (max-width: 768px) {
-    padding: 1rem 0.5rem;
-  }
-}
-
 .f-header {
   container-type: inline-size;
   margin: 2rem 1rem;

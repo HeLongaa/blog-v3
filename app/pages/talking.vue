@@ -189,138 +189,138 @@ onUnmounted(() => {
 </script>
 
 <template>
-<div class="moments-container">
-	<header class="moments-header">
-		<h3 class="moments-title">
-			瞬间
-		</h3>
-		<p class="moments-desc">
-			生活需要仪式感，保持记录可以让人变得自律。
-		</p>
-	</header>
+<!-- <div class="moments-container"> -->
+<header class="moments-header">
+	<h3 class="moments-title">
+		瞬间
+	</h3>
+	<p class="moments-desc">
+		生活需要仪式感，保持记录可以让人变得自律。
+	</p>
+</header>
 
-	<div class="moments-list">
-		<!-- 初始加载状态 -->
-		<div v-if="initialLoading">
-			<div class="loading-container">
-				<Icon name="ph:circle-notch" class="loading-icon" />
-				<span>正在加载瞬间...</span>
-			</div>
+<div class="moments-list">
+	<!-- 初始加载状态 -->
+	<div v-if="initialLoading">
+		<div class="loading-container">
+			<Icon name="ph:circle-notch" class="loading-icon" />
+			<span>正在加载瞬间...</span>
+		</div>
 
-			<!-- 骨架屏 -->
-			<div class="skeleton-container">
-				<div v-for="i in 3" :key="i" class="skeleton-moment">
-					<div class="skeleton-header">
-						<div class="skeleton-avatar" />
-						<div class="skeleton-info">
-							<div class="skeleton-name" />
-							<div class="skeleton-date" />
-						</div>
+		<!-- 骨架屏 -->
+		<div class="skeleton-container">
+			<div v-for="i in 3" :key="i" class="skeleton-moment">
+				<div class="skeleton-header">
+					<div class="skeleton-avatar" />
+					<div class="skeleton-info">
+						<div class="skeleton-name" />
+						<div class="skeleton-date" />
 					</div>
-					<div class="skeleton-content">
-						<div class="skeleton-text" />
-						<div class="skeleton-text short" />
-					</div>
+				</div>
+				<div class="skeleton-content">
+					<div class="skeleton-text" />
+					<div class="skeleton-text short" />
 				</div>
 			</div>
 		</div>
+	</div>
 
-		<!-- 动态列表 -->
-		<div v-for="(moment, groupIndex) in displayedMoments" v-else :key="`${groupIndex}-${moment.name}`" class="moment-group">
-			<div
-				v-for="(item, index) in moment.moment_list"
-				:key="`${groupIndex}-${index}`"
-				class="moment-item"
-				:class="{ 'is-top': item.is_top }"
-				:style="{ '--delay': `${(groupIndex * moment.moment_list.length + index) * 0.1}s` }"
-			>
-				<!-- 置顶标签 -->
-				<div v-if="item.is_top" class="top-badge">
-					<Icon name="ph:push-pin-bold" />
-					置顶
-				</div>
+	<!-- 动态列表 -->
+	<div v-for="(moment, groupIndex) in displayedMoments" v-else :key="`${groupIndex}-${moment.name}`" class="moment-group">
+		<div
+			v-for="(item, index) in moment.moment_list"
+			:key="`${groupIndex}-${index}`"
+			class="moment-item"
+			:class="{ 'is-top': item.is_top }"
+			:style="{ '--delay': `${(groupIndex * moment.moment_list.length + index) * 0.1}s` }"
+		>
+			<!-- 置顶标签 -->
+			<div v-if="item.is_top" class="top-badge">
+				<Icon name="ph:push-pin-bold" />
+				置顶
+			</div>
 
-				<div class="moment-meta">
-					<a :href="moment.avatarLink" class="avatar-link">
-						<img :src="moment.avatar" :alt="moment.name" class="avatar">
-					</a>
-					<div class="info">
-						<div class="moment-nick">
-							{{ moment.name }}
-							<Icon name="ph:seal-check-fill" class="verified" />
-						</div>
-						<div class="moment-date">
-							{{ item.date }}
-						</div>
+			<div class="moment-meta">
+				<a :href="moment.avatarLink" class="avatar-link">
+					<img :src="moment.avatar" :alt="moment.name" class="avatar">
+				</a>
+				<div class="info">
+					<div class="moment-nick">
+						{{ moment.name }}
+						<Icon name="ph:seal-check-fill" class="verified" />
+					</div>
+					<div class="moment-date">
+						{{ item.date }}
 					</div>
 				</div>
+			</div>
 
-				<div class="moment-content">
-					<p class="content-text">
-						{{ decodeHtmlEntities(item.content) }}
-					</p>
-					<div v-if="item.image && item.image.length > 0" class="image-grid">
-						<figure
-							v-for="(img, imgIndex) in item.image"
-							:key="imgIndex"
-							class="grid-item image"
-							@click="openImageLightbox"
+			<div class="moment-content">
+				<p class="content-text">
+					{{ decodeHtmlEntities(item.content) }}
+				</p>
+				<div v-if="item.image && item.image.length > 0" class="image-grid">
+					<figure
+						v-for="(img, imgIndex) in item.image"
+						:key="imgIndex"
+						class="grid-item image"
+						@click="openImageLightbox"
+					>
+						<img
+							:src="img"
+							:alt="`图片 ${imgIndex + 1}`"
+							class="grid-img"
+							style="cursor: zoom-in;"
 						>
-							<img
-								:src="img"
-								:alt="`图片 ${imgIndex + 1}`"
-								class="grid-img"
-								style="cursor: zoom-in;"
-							>
-						</figure>
-					</div>
-				</div>
-
-				<div class="moment-bottom">
-					<div class="moment-meta-info">
-						<div v-if="item.tags && item.tags.length > 0" class="moment-tags">
-							<span v-for="tag in item.tags" :key="tag" class="tag">
-								<Icon name="ph:tag-bold" /> {{ tag }}
-							</span>
-						</div>
-					</div>
-					<button class="comment-btn" @click="scrollToComment(item.content)">
-						<Icon name="hugeicons:comment-01" />
-					</button>
+					</figure>
 				</div>
 			</div>
-		</div>
-	</div>
 
-	<!-- 加载状态 -->
-	<div v-if="loading" class="loading-indicator">
-		<Icon name="ph:circle-notch" class="loading-icon" />
-		<span>加载中...</span>
-	</div>
-	<div v-if="!hasMore && displayedMoments.length > 0" class="no-more">
-		<Icon name="ph:check-circle-bold" />
-		<span>已加载全部动态</span>
-	</div>
-	<div v-if="!initialLoading && !loading && displayedMoments.length === 0" class="empty-state">
-		<Icon name="ph:smiley-sad" />
-		<p>暂时还没有动态</p>
-	</div>
-	<div id="comment-section">
-		<PostComment />
+			<div class="moment-bottom">
+				<div class="moment-meta-info">
+					<div v-if="item.tags && item.tags.length > 0" class="moment-tags">
+						<span v-for="tag in item.tags" :key="tag" class="tag">
+							<Icon name="ph:tag-bold" /> {{ tag }}
+						</span>
+					</div>
+				</div>
+				<button class="comment-btn" @click="scrollToComment(item.content)">
+					<Icon name="hugeicons:comment-01" />
+				</button>
+			</div>
+		</div>
 	</div>
 </div>
+
+<!-- 加载状态 -->
+<div v-if="loading" class="loading-indicator">
+	<Icon name="ph:circle-notch" class="loading-icon" />
+	<span>加载中...</span>
+</div>
+<div v-if="!hasMore && displayedMoments.length > 0" class="no-more">
+	<Icon name="ph:check-circle-bold" />
+	<span>已加载全部动态</span>
+</div>
+<div v-if="!initialLoading && !loading && displayedMoments.length === 0" class="empty-state">
+	<Icon name="ph:smiley-sad" />
+	<p>暂时还没有动态</p>
+</div>
+<div id="comment-section">
+	<PostComment />
+</div>
+<!-- </div> -->
 </template>
 
 <style lang="scss" scoped>
-.moments-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 0 1rem;
-
-  @media (max-width: 768px) {
-    padding: 1rem 0.5rem;
-  }
-}
+//.moments-container {
+//  max-width: 800px;
+//  margin: 0 auto;
+//  padding: 0 1rem;
+//
+//  @media (max-width: 768px) {
+//    padding: 1rem 0.5rem;
+//  }
+//}
 
 .moments-header {
   container-type: inline-size;
@@ -351,7 +351,7 @@ onUnmounted(() => {
 }
 
 .moments-list {
-  margin-bottom: 2rem;
+  margin: 2rem 0.5rem 2rem 0.5rem;
 }
 
 .moment-item {

@@ -207,7 +207,7 @@ onUnmounted(() => {
 
 <style lang="scss" scoped>
 .z-comment {
-  margin: 3rem 1rem;
+  margin: 3rem 0.5rem;
 
   > h3 {
     margin-top: 3rem;
@@ -234,6 +234,12 @@ onUnmounted(() => {
     border-radius: 0.8rem !important;
     background-color: var(--ld-bg-card);
     box-shadow: 0 0.1em 0.2em var(--ld-shadow);
+    border:none !important;
+    transition: all 0.2s ease;
+    &:hover{
+      box-shadow: 0 0.5em 1em var(--ld-shadow);
+      transform: translateY(-2px);
+    }
   }
   .atk-textarea{
     background-color: var(--ld-bg-card);
@@ -349,6 +355,7 @@ onUnmounted(() => {
       background-color: var(--c-bg-2) !important;
       box-shadow: 0 0.1em 0.2em var(--ld-shadow);
       color: var(--c-text-1) !important;
+      border:none !important;
     }
 
     .atk-content p {
