@@ -61,6 +61,7 @@ const keycut = computed(() => navigator?.userAgent.includes('Mac OS') ? '⌘K' :
 		position: fixed;
 		left: 0;
 		width: 320px;
+    border-radius: 0 1rem 1rem 0;
 		max-width: 100%;
 		background-color: var(--ld-bg-blur);
 		backdrop-filter: blur(0.5rem);
@@ -79,8 +80,10 @@ const keycut = computed(() => navigator?.userAgent.includes('Mac OS') ? '⌘K' :
 #z-sidebar-bgmask {
 	position: fixed;
 	inset: 0;
-	background-color: #0003;
-	transition: opacity 0.2s;
+	////background-color: #0003;
+  //background-color: var(--c-bg-soft);
+  backdrop-filter: blur(0.5rem);
+  transition: opacity 0.2s;
 	z-index: 100;
 
 	&.v-enter-from,

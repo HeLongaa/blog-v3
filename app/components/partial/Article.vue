@@ -15,11 +15,9 @@ const categoryColor = computed(() => appConfig.article.categories[categoryLabel.
 const categoryIcon = computed(() => getCategoryIcon(categoryLabel.value))
 const pageKey = computed(() => props.to || props.path || '')
 onMounted(async () => {
-	// 首次进入
 	await loadArtalk()
 })
 
-// 路由切换后 pageKey 变了再执行
 watch(pageKey, loadArtalk, { immediate: false })
 async function loadArtalk() {
 	if (process.client) {

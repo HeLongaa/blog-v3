@@ -1,3 +1,21 @@
+<script setup>
+const layoutStore = useLayoutStore()
+
+// 确保页面卸载或刷新时解锁滚动
+onUnmounted(() => {
+	if (typeof document !== 'undefined') {
+		document.body.style.overflow = ''
+	}
+})
+
+// 监听页面卸载事件
+if (typeof window !== 'undefined') {
+	window.addEventListener('beforeunload', () => {
+		document.body.style.overflow = ''
+	})
+}
+</script>
+
 <template>
 <NuxtLoadingIndicator />
 <SkipToContent />

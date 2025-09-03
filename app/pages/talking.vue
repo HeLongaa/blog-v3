@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { LazyPopoverLightbox } from '#components'
 import { onMounted, onUnmounted, ref } from 'vue'
 import { decodeHtmlEntities } from '~/utils/html'
 
@@ -12,6 +13,7 @@ const layoutStore = useLayoutStore()
 layoutStore.setAside(['blog-stats', 'friend-posts', 'blog-tech', 'comm-group'])
 
 const dataCacheStore = useDataCacheStore()
+const popoverStore = usePopoverStore()
 
 interface MomentItem {
 	date: string
@@ -41,8 +43,6 @@ const initialLoading = ref(true)
 const hasMore = ref(true)
 const currentIndex = ref(0)
 const pageSize = 10
-
-// 计算当前页的显示数据
 function updateDisplayedMoments() {
 	const endIndex = Math.min(currentIndex.value + pageSize, allMomentsData.value.length)
 	const newMoments = allMomentsData.value.slice(currentIndex.value, endIndex)
@@ -51,8 +51,6 @@ function updateDisplayedMoments() {
 		hasMore.value = false
 		return
 	}
-
-	// 转换数据格式
 	const displayData: DisplayMoment[] = newMoments.map(item => ({
 		name: appConfig.author.name,
 		avatar: getGhAvatar(appConfig.author.name),
@@ -73,8 +71,6 @@ function updateDisplayedMoments() {
 		hasMore.value = false
 	}
 }
-
-// 获取所有动态数据
 async function fetchAllMoments(forceRefresh = false) {
 	if (loading.value && !initialLoading.value)
 		return
@@ -89,13 +85,9 @@ async function fetchAllMoments(forceRefresh = false) {
 	try {
 		const data = await dataCacheStore.getMoments(forceRefresh)
 		allMomentsData.value = data
-
-		// 重置分页状态
 		displayedMoments.value = []
 		currentIndex.value = 0
 		hasMore.value = data.length > 0
-
-		// 加载第一页
 		updateDisplayedMoments()
 	}
 	catch (error) {
@@ -107,8 +99,6 @@ async function fetchAllMoments(forceRefresh = false) {
 		initialLoading.value = false
 	}
 }
-
-// 加载更多数据
 function loadMore() {
 	if (loading.value || !hasMore.value)
 		return
@@ -119,8 +109,6 @@ function loadMore() {
 		loading.value = false
 	}, 300) // 添加轻微延迟以改善用户体验
 }
-
-// 格式化日期
 function formatDate(dateString: string) {
 	const date = new Date(dateString)
 	const now = new Date()
@@ -156,8 +144,6 @@ function formatDate(dateString: string) {
 		})
 	}
 }
-
-// 滚动加载
 function handleScroll() {
 	const scrollTop = window.pageYOffset || document.documentElement.scrollTop
 	const windowHeight = window.innerHeight
@@ -167,7 +153,6 @@ function handleScroll() {
 		loadMore()
 	}
 }
-// 滚动到评论区
 function scrollToComment(content: string) {
 	const commentSection = document.getElementById('comment-section')
 	if (commentSection) {
@@ -181,6 +166,15 @@ function scrollToComment(content: string) {
 				textarea.dispatchEvent(new Event('input', { bubbles: true }))
 			}
 		}, 500)
+	}
+}
+function openImageLightbox(event: Event) {
+	const imgElement = event.target as HTMLImageElement
+	if (imgElement && imgElement.tagName === 'IMG') {
+		const { open } = popoverStore.use(() => h(LazyPopoverLightbox, {
+			el: imgElement,
+		}))
+		open()
 	}
 }
 
@@ -266,16 +260,19 @@ onUnmounted(() => {
 						{{ decodeHtmlEntities(item.content) }}
 					</p>
 					<div v-if="item.image && item.image.length > 0" class="image-grid">
-						<a
+						<figure
 							v-for="(img, imgIndex) in item.image"
 							:key="imgIndex"
-							:href="img"
-							target="_blank"
-							class="grid-item"
-							rel="noopener noreferrer"
+							class="grid-item image"
+							@click="openImageLightbox"
 						>
-							<img :src="img" :alt="`图片 ${imgIndex + 1}`" class="grid-img">
-						</a>
+							<img
+								:src="img"
+								:alt="`图片 ${imgIndex + 1}`"
+								class="grid-img"
+								style="cursor: zoom-in;"
+							>
+						</figure>
 					</div>
 				</div>
 
@@ -300,20 +297,14 @@ onUnmounted(() => {
 		<Icon name="ph:circle-notch" class="loading-icon" />
 		<span>加载中...</span>
 	</div>
-
-	<!-- 没有更多数据 -->
 	<div v-if="!hasMore && displayedMoments.length > 0" class="no-more">
 		<Icon name="ph:check-circle-bold" />
 		<span>已加载全部动态</span>
 	</div>
-
-	<!-- 空状态 -->
 	<div v-if="!initialLoading && !loading && displayedMoments.length === 0" class="empty-state">
 		<Icon name="ph:smiley-sad" />
 		<p>暂时还没有动态</p>
 	</div>
-
-	<!-- 评论区 -->
 	<div id="comment-section">
 		<PostComment />
 	</div>
@@ -324,7 +315,7 @@ onUnmounted(() => {
 .moments-container {
   max-width: 800px;
   margin: 0 auto;
-  padding: 0rem 1rem;
+  padding: 0 1rem;
 
   @media (max-width: 768px) {
     padding: 1rem 0.5rem;
@@ -495,7 +486,7 @@ onUnmounted(() => {
 
   .grid-item {
     overflow: hidden;
-    border-radius: 12px;
+    border-radius: 0.5rem;
     display: block;
     width: 350px;
     transition: transform 0.2s ease;
@@ -517,7 +508,6 @@ onUnmounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-top: 1px solid var(--c-border-soft);
   margin-top: auto; /* 让底部区域自动推到底部 */
 
   @media (max-width: 768px) {

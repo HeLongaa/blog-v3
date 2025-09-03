@@ -39,8 +39,8 @@ const { widgets } = useWidgets(() => layoutStore.asideWidgets)
 			padding: 0.5rem;
 			border-radius: 1rem;
 			box-shadow: 0 0 1rem var(--ld-shadow);
-			background-color: var(--ld-bg-blur);
-			backdrop-filter: blur(0.5rem);
+      background-color: var(--ld-bg-blur);
+      backdrop-filter: blur(0.5rem);
 		}
 
 		&.show {
@@ -52,7 +52,9 @@ const { widgets } = useWidgets(() => layoutStore.asideWidgets)
 #z-aside-bgmask {
 	position: fixed;
 	inset: 0;
-	background-color: #0003;
+	//background-color: #0003;
+  //background-color: var(--c-bg-soft);
+  backdrop-filter: blur(0.5rem);
 	transition: opacity 0.2s;
 	z-index: 100;
 
