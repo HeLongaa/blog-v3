@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const appConfig = useAppConfig()
 const layoutStore = useLayoutStore()
-layoutStore.setAside(['blog-stats', 'friend-posts', 'blog-tech', 'comm-group'])
+layoutStore.setAside(['blog-stats', 'blog-log', 'blog-tech', 'comm-group'])
 useSeoMeta({
 	title: '关于',
 	ogType: 'profile',
@@ -70,6 +70,11 @@ useSeoMeta({
 			<iconify-icon icon="skill-icons:notion-light" width="48" height="48" />
 			<iconify-icon icon="icon-park:more-two" width="48" height="48" />
 		</div>
+		<h2 id="我的项目">
+			<a href="#我的项目">我的项目</a>
+		</h2>
+		<p>待添加 (还没有想好展示方式）......</p>
+
 		<h2 id="联系我">
 			<a href="#联系我">联系我</a>
 		</h2>

@@ -309,7 +309,9 @@ onMounted(() => {
     color: var(--c-brand);
   }
 }
-
+.posts-container{
+  margin: 0 0.5rem
+}
 .post-grid {
   display: flex;
   flex-direction: column;

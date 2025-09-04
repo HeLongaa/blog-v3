@@ -488,7 +488,7 @@ onUnmounted(() => {
     overflow: hidden;
     border-radius: 0.5rem;
     display: block;
-    width: 350px;
+    max-width: 380px;
     transition: transform 0.2s ease;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
