@@ -14,18 +14,15 @@
 
 - 申请方式：使用本站自助申请按钮或在该评论区留言
 
-- 信息可能会被适当修改，以保证展示效果! 
+- 信息可能会被适当修改，以保证展示效果!
 
 ::
 
 ::link-card
 ---
-icon: https://n8n.io/favicon.ico
+icon: https://oss.helong.online/bucket-IMG/3f9fc8f29ec0b69782bcb0dfe7316c2527d98bf80d8c79f054551102e5081d32.svg
 title: 友链申请
 link: "https://n8n-trcqhocy.ap-northeast-1.clawcloudrun.com/form/9bb44bfc-db7f-43db-9ed7-4b0072bc2710"
 class: gradient-card active
 ---
 ::
-
-
-
