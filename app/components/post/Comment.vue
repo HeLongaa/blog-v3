@@ -257,7 +257,7 @@ onUnmounted(() => {
   }
 
   .atk-comment-wrap {
-    margin: 16px 0;
+    margin: 0.6rem 0;
     background-color: var(--ld-bg-card);;
     border-radius: 0.8rem;
     box-shadow: 0 0.1em 0.2em var(--ld-shadow);
