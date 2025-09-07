@@ -1,14 +1,10 @@
+<!-- eslint-disable vue/block-lang -->
 <script setup>
-const layoutStore = useLayoutStore()
-
-// 确保页面卸载或刷新时解锁滚动
 onUnmounted(() => {
 	if (typeof document !== 'undefined') {
 		document.body.style.overflow = ''
 	}
 })
-
-// 监听页面卸载事件
 if (typeof window !== 'undefined') {
 	window.addEventListener('beforeunload', () => {
 		document.body.style.overflow = ''
@@ -22,14 +18,18 @@ if (typeof window !== 'undefined') {
 <ZSidebar />
 <div id="content">
 	<main id="main-content">
-		<NuxtPage />
-		<ZFooter />
+		<div class="main-wrapper">
+			<div class="page-content">
+				<NuxtPage />
+			</div>
+			<ZFooter />
+		</div>
 	</main>
 	<ZAside />
 </div>
+<FloatButton />
 <ZPanel />
 <ZPopover />
-<FloatButton />
 </template>
 
 <!-- eslint-disable-next-line vue/enforce-style-attribute -->
@@ -68,12 +68,26 @@ aside {
 	// 此处不建议给内容设置 padding
 	> main {
 		flex-grow: 1; // 使较小宽度的内容占满
+		display: flex;
+		flex-direction: column;
+		min-height: 100vh; // 确保 main 至少占满整个视窗高度
 
 		// overflow: hidden; // 会使一部分元素吸顶失效
 
 		// 使内容正确计算宽度而不横向溢出
 		// 也可设置 width: 0 或者 contain: inline-size（兼容性不佳）
 		min-width: 0;
+
+		.main-wrapper {
+			display: flex;
+			flex-direction: column;
+			flex: 1;
+			min-height: 100%;
+
+			.page-content {
+				flex: 1;
+			}
+		}
 	}
 }
 </style>

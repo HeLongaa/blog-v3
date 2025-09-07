@@ -1,8 +1,0 @@
-main:
-  push:
-    - docker:
-        image: node:22.18.0
-      stages:
-        - node -v
-        - pnpm i
-        - pnpm pnpm generate

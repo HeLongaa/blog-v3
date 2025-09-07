@@ -249,11 +249,6 @@ onUnmounted(() => {
     background-color: var(--c-primary) !important;
     border-radius: 16px !important;
     transition: all 0.2s;
-
-    &:hover {
-      box-shadow: 0 0.5em 1em var(--ld-shadow);
-      transform: translateY(-2px);
-    }
   }
 
   .atk-comment-wrap {
@@ -326,6 +321,9 @@ onUnmounted(() => {
       margin: 0 !important;
       padding: 8px 12px !important;
 
+      span{
+        padding: 0 1rem !important;
+      }
       &::marker {
         display: none !important;
       }

@@ -1,7 +1,7 @@
 <template>
-<a 
-	href="https://linux.do" 
-	target="_blank" 
+<a
+	href="https://linux.do"
+	target="_blank"
 	rel="noopener noreferrer"
 	class="community-link"
 >
@@ -29,7 +29,7 @@
 	text-decoration: none;
 	color: inherit;
 	transition: transform 0.2s ease, opacity 0.2s ease;
-	
+
 	&:hover {
 		transform: translateY(-2px);
 		opacity: 0.9;

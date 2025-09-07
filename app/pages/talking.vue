@@ -230,7 +230,7 @@ onUnmounted(() => {
 		<div
 			v-for="(item, index) in moment.moment_list"
 			:key="`${groupIndex}-${index}`"
-			class="moment-item"
+			class="moment-item card"
 			:class="{ 'is-top': item.is_top }"
 			:style="{ '--delay': `${(groupIndex * moment.moment_list.length + index) * 0.1}s` }"
 		>
@@ -356,25 +356,8 @@ onUnmounted(() => {
 
 .moment-item {
   border-radius: 0.8rem;
-  box-shadow: 0 0.1em 0.2em var(--ld-shadow);
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 0.6rem;
+  margin-bottom: 1rem;
   padding: .9rem;
-  position: relative;
-  transition: all 0.2s ease;
-  background: var(--ld-bg-card);
-  animation: float-in 0.2s var(--delay) backwards;
-  &:hover {
-    box-shadow: 0 0.5em 1em var(--ld-shadow);
-    transform: translateY(-2px);
-  }
-
-  @media (max-width: 768px) {
-    padding: 1rem;
-    margin-bottom: 1rem;
-    min-height: 180px;
-  }
 }
 
 .top-badge {

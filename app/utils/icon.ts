@@ -40,7 +40,7 @@ export function getArchIcon(arch: Arch) {
 export const ciIcons: Record<string, string> = {
 	'Cloudflare Pages': 'devicon:cloudflare',
 	'Cloudflare Workers': 'devicon:cloudflareworkers',
-	'EdgeOne': 'https://edgeone.ai/favicon.ico',
+	'EdgeOne': 'https://oss.helong.online/bucket-IMG/edgeone.ico',
 	'GitHub Actions': 'ri:github-fill',
 	'Netlify CI': 'catppuccin:netlify',
 	'Vercel': 'ri:vercel-fill',
@@ -55,6 +55,7 @@ const mainDomainIcons: Record<string, string> = {
 	'github.io': 'ri:github-fill',
 	'google.cn': 'ri:google-fill',
 	'google.com': 'ri:google-fill',
+	'helong.online': 'la:blog',
 	'microsoft.com': 'ri:microsoft-fill',
 	'netlify.app': 'simple-icons:netlify',
 	'pages.dev': 'simple-icons:cloudflare',
@@ -64,7 +65,6 @@ const mainDomainIcons: Record<string, string> = {
 	'vercel.app': 'simple-icons:vercel',
 	'zabaur.app': 'tabler:square-letter-z-filled',
 	'zhihu.com': 'ri:zhihu-line',
-	'helong.online': 'la:blog',
 }
 
 /** 专门域名图标映射，优先级高于主域名图标 */

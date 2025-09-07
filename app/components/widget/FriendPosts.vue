@@ -16,19 +16,16 @@ const dataCacheStore = useDataCacheStore()
 const posts = ref<FriendPost[]>([])
 const loading = ref(true)
 
-// 格式化日期为月日格式
 function formatDate(dateStr: string) {
 	const date = new Date(dateStr)
 	return date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })
 }
 
-// 加载数据
 async function loadPosts() {
 	try {
-		// 尝试从缓存获取
 		const cachedData = dataCacheStore.getCache<FriendPost[]>('friends-posts')
 		if (cachedData && cachedData.length > 0) {
-			posts.value = cachedData.slice(0, 3) // 显示前3条
+			posts.value = cachedData.slice(0, 3)
 			loading.value = false
 			return
 		}
@@ -38,14 +35,8 @@ async function loadPosts() {
 			throw new Error('Failed to fetch')
 
 		const allPosts: FriendPost[] = await response.json()
-
-		// 按时间排序
 		allPosts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-
-		// 缓存数据
-		dataCacheStore.setCache('friends-posts', allPosts, 5 * 60 * 1000) // 5分钟缓存
-
-		// 显示前3条
+		dataCacheStore.setCache('friends-posts', allPosts, 5 * 60 * 1000)
 		posts.value = allPosts.slice(0, 3)
 	}
 	catch (error) {
@@ -55,8 +46,6 @@ async function loadPosts() {
 		loading.value = false
 	}
 }
-
-// 初始加载
 onMounted(() => {
 	loadPosts()
 })

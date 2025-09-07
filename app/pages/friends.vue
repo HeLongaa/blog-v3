@@ -131,8 +131,8 @@ function loadMore() {
 }
 
 // 滚动加载
-// eslint-disable-next-line unused-imports/no-unused-vars
-const { arrivedState} = useScroll(window, {
+
+const { arrivedState } = useScroll(window, {
 	offset: { bottom: 100 },
 })
 
@@ -191,7 +191,7 @@ onMounted(() => {
 			<article
 				v-for="(post, index) in displayedPosts"
 				:key="`${post.domain}-${post.title}-${index}`"
-				class="post-card"
+				class="post-card card"
 				:style="{ '--delay': `${(index % pageSize) * 0.05}s` }"
 			>
 				<a
@@ -315,22 +315,13 @@ onMounted(() => {
 .post-grid {
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
 }
 
 .post-card {
-  background: var(--c-bg-soft);
   border-radius: 0.8rem;
-  overflow: hidden;
-  transition: all 0.2s;
-  animation: fade-in 0.6s ease-out backwards;
-  animation-delay: var(--delay);
-  box-shadow: 0 0.1em 0.2em var(--ld-shadow);
+  margin-bottom: 1rem;
 
   &:hover {
-    box-shadow: 0 0.5em 1em var(--ld-shadow);
-    transform: translateY(-2px);
-
     .post-title {
       color: var(--c-primary);
     }
@@ -346,13 +337,6 @@ onMounted(() => {
   color: inherit;
   gap: 1rem;
   background: var(--ld-bg-card);;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 1rem;
-    gap: 0.75rem;
-  }
 }
 
 .post-main {

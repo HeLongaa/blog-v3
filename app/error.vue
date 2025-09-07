@@ -6,7 +6,7 @@ const props = defineProps({
 })
 
 const layoutStore = useLayoutStore()
-layoutStore.setAside(['blog-log'])
+layoutStore.setAside([])
 
 const errorStack = removeHtmlTags(props.error?.stack)
 

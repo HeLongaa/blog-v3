@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const appConfig = useAppConfig()
 const layoutStore = useLayoutStore()
-layoutStore.setAside(['blog-stats', 'blog-log', 'blog-tech', 'comm-group'])
+layoutStore.setAside(['blog-stats', 'blog-log', 'blog-tech', 'github-card', 'comm-group'])
 useSeoMeta({
 	title: '关于',
 	ogType: 'profile',

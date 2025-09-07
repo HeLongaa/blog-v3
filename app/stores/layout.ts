@@ -39,7 +39,7 @@ export const useLayoutStore = defineStore('layout', () => {
 
 	const toggle = (key: LayoutSection) => {
 		const isActive = open.value[key]
-		
+
 		if (isActive) {
 			// 关闭当前面板
 			open.value[key] = false
@@ -70,7 +70,7 @@ export const useLayoutStore = defineStore('layout', () => {
 				unlockScroll()
 			}
 		}
-		
+
 		window.addEventListener('resize', handleResize)
 	}
 
