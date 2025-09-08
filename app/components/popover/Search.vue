@@ -12,7 +12,15 @@ const searchInput = ref<HTMLInputElement>()
 
 watch(() => props.isOpening, async (isOpen) => {
 	await nextTick()
-	isOpen && searchInput.value?.select()
+	if (isOpen) {
+		searchInput.value?.select()
+		// 禁用背景页面滚动
+		document.body.style.overflow = 'hidden'
+	}
+	else {
+		// 恢复背景页面滚动
+		document.body.style.overflow = ''
+	}
 })
 
 // TODO: 随机展示热门搜索词
@@ -80,7 +88,7 @@ function openActiveItem() {
 					ref="searchInput"
 					v-model="word"
 					class="search-input"
-					placeholder="键入开始搜索"
+					placeholder="通过输入标题或关键字在本站搜索"
 					@keydown.up.prevent
 					@keydown.down.prevent
 				>

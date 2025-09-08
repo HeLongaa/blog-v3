@@ -106,7 +106,7 @@ async function loadArtalk() {
 .article-card {
 	container-type: inline-size;
 	position: relative;
-	margin: 1rem 0;
+	// margin: 1rem 0;
 	border-radius: 0.8rem;
 	color: var(--c-text);
 	animation: float-in 0.2s var(--delay) backwards;

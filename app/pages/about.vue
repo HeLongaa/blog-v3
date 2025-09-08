@@ -63,7 +63,7 @@ useSeoMeta({
 			<iconify-icon icon="skill-icons:vercel-dark" width="48" height="48" />
 			<iconify-icon icon="skill-icons:cloudflare-dark" width="48" height="48" />
 			<iconify-icon icon="skill-icons:netlify-dark" width="48" height="48" />
-			<img src="https://edgeone.ai/favicon.ico" width="48" height="48" alt="EdgeOne" class="outimg">
+			<img src="https://oss.helong.online/bucket-IMG/edgeone.ico" width="48" height="48" alt="EdgeOne" class="outimg">
 			<iconify-icon icon="hugeicons:chat-gpt" width="48" height="48" />
 			<iconify-icon icon="hugeicons:deepseek" width="48" height="48" />
 			<iconify-icon icon="material-icon-theme:claude" width="48" height="48" />

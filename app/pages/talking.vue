@@ -356,7 +356,6 @@ onUnmounted(() => {
 
 .moment-item {
   border-radius: 0.8rem;
-  margin-bottom: 1rem;
   padding: .9rem;
 }
 
@@ -480,10 +479,7 @@ onUnmounted(() => {
     width: 100%;
     object-fit: cover;
     display: block;
-
-    @media (max-width: 768px) {
-      height: 250px;
-    }
+    max-height: 250px;
   }
 }
 
@@ -510,6 +506,10 @@ onUnmounted(() => {
   display: flex;
   gap: 0.5rem;
   flex-wrap: wrap;
+  background-color: var(--c-bg-2);
+  border-radius: 8px;
+  margin-left: 0.5rem;
+  margin-top: 1rem;
 }
 
 .tag {

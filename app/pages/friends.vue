@@ -312,15 +312,9 @@ onMounted(() => {
 .posts-container{
   margin: 0 0.5rem
 }
-.post-grid {
-  display: flex;
-  flex-direction: column;
-}
 
 .post-card {
   border-radius: 0.8rem;
-  margin-bottom: 1rem;
-
   &:hover {
     .post-title {
       color: var(--c-primary);

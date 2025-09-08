@@ -1,4 +1,4 @@
-import blogConfig from "~~/blog.config";
+import blogConfig from '~~/blog.config'
 
 interface CachedData<T = any> {
 	data: T

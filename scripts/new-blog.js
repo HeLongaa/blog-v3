@@ -1,8 +1,8 @@
 import { exec } from 'node:child_process'
+import crypto from 'node:crypto'
 import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
-import crypto from 'node:crypto'
 
 // 获取当前路径和参数
 const args = process.argv.slice(2)

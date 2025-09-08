@@ -7,6 +7,7 @@
 	box-shadow: 0 0.1em 0.2em var(--ld-shadow);
 	background-color: var(--ld-bg-card);
 	transition: all 0.2s;
+	margin: 0.6rem 0;
 
 	&:hover {
 		box-shadow: 0 0.5em 1em var(--ld-shadow);
@@ -18,7 +19,7 @@
 	position: relative;
 	border-radius: 0.5rem;
 	background: no-repeat 100% / 400%;
-	background-image: linear-gradient(45deg, var(--c-accent), var(--c-primary-soft) 40%, transparent 50%);
+	background-image: linear-gradient(45deg, var(--c-primary), var(--c-primary-soft) 40%, transparent 50%);
 	transition: all 0.5s;
 	z-index: 0;
 
