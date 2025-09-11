@@ -314,7 +314,6 @@ onMounted(() => {
 }
 
 .post-card {
-  border-radius: 0.8rem;
   &:hover {
     .post-title {
       color: var(--c-primary);

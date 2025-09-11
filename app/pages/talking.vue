@@ -355,7 +355,6 @@ onUnmounted(() => {
 }
 
 .moment-item {
-  border-radius: 0.8rem;
   padding: .9rem;
 }
 

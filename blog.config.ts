@@ -62,13 +62,14 @@ const blogConfig = {
 
 	data: {
 		api_endpoint: 'https://api-blog.helong.online',
+		submit_API: 'https://n8n-trcqhocy.ap-northeast-1.clawcloudrun.com',
 	},
 }
 
 // 用于生成 OPML 和友链页面配置
 export const myFeed = <FeedEntry>{
 	author: blogConfig.author.name,
-	sitenick: '摸鱼处',
+	sitenick: '个人站点',
 	title: blogConfig.title,
 	desc: blogConfig.subtitle || blogConfig.description,
 	link: blogConfig.url,
