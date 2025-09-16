@@ -56,7 +56,7 @@ comment: false
 
 ::link-card
 ---
-icon: https://oss.helong.online/bucket-IMG/bea2394fef15b88de49ae37707b3c1b86d7dbc2035a752ef2581a8b6cb3b2e8c.png
+icon: https://oss.helong.online/bucket-IMG/avatar.png
 title: 留言板
 link: "/messages"
 ---

@@ -39,6 +39,7 @@ onMounted(() => {
 	<ZRawLink
 		class="feed-card gradient-card"
 		:data-error="error"
+		:to="error ? undefined : link"
 	>
 		<div class="avatar">
 			<ClientOnly v-if="inspect">

@@ -13,7 +13,7 @@ const blogConfig = {
 	description: '硅基漫游指南，分享技术与生活。这个博客记录了在生活和技术学习中的点滴经历，网站界面简洁美观，内容丰富实用，人气互动活跃，涵盖了编程、生活、学习等多个领域。',
 	author: {
 		name: 'HeLongaa',
-		avatar: 'https://oss.helong.online/bucket-IMG/bea2394fef15b88de49ae37707b3c1b86d7dbc2035a752ef2581a8b6cb3b2e8c.png',
+		avatar: 'https://weavatar.com/avatar/fc07e57f116ab3f3107dbaab1ceb8fc953557ff816a0ebdef9769241c32d5825?sha256=1&d=mp&s=240',
 		email: 'helong_001@qq.com',
 		homepage: 'https://helong.online',
 	},
@@ -22,7 +22,7 @@ const blogConfig = {
 		name: '署名-非商业性使用-相同方式共享 4.0 国际',
 		url: 'https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh-hans',
 	},
-	favicon: 'https://oss.helong.online/bucket-IMG/bea2394fef15b88de49ae37707b3c1b86d7dbc2035a752ef2581a8b6cb3b2e8c.png',
+	favicon: 'https://oss.helong.online/bucket-IMG/avatar.png',
 	language: 'zh-CN',
 	timeEstablished: '2025-07-19',
 	timezone: 'Asia/Shanghai',
