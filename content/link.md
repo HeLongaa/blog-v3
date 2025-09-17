@@ -23,6 +23,6 @@ name: 硅基漫游指南
 link: https://blog.helong.online
 avatar: https://oss.helong.online/bucket-IMG/avatar.png
 descr: 等待和犹豫才是这个世界上最无情的杀手
-atom: http://localhost:3000/atom.xml
+atom: https://blog.helong.online/atom.xml
 mail: helong_001@qq.com
 ```
