@@ -1,0 +1,35 @@
+name: Deploy to EdgeOne Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    container:
+      image: node:20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install dependencies
+        run: pnpm i
+
+      - name: Build static site
+        run: pnpm generate
+
+      - name: Install edgeone CLI
+        run: npm install -g edgeone
+
+      - name: Deploy to EdgeOne Pages
+        run: |
+          edgeone pages deploy \
+            $GITHUB_WORKSPACE/.output/public \
+            -n blog-helong \
+            -t ${{ secrets.EDGEONE_TOKEN }}
