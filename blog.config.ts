@@ -75,7 +75,7 @@ export const myFeed = <FeedEntry>{
 	link: blogConfig.url,
 	feed: new URL('/atom.xml', blogConfig.url).toString(),
 	icon: blogConfig.favicon,
-	avatar: blogConfig.author.avatar,
+	avatar: blogConfig.favicon,
 	archs: ['Nuxt', 'EdgeOne'],
 	date: blogConfig.timeEstablished,
 	comment: '这是我自己',

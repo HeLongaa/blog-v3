@@ -35,6 +35,7 @@ const formData = reactive({
 const submitting = ref(false)
 const showSuccessMessage = ref(false)
 const showErrorMessage = ref(false)
+const showPasteError = ref(false)
 
 async function submitForm() {
 	submitting.value = true
@@ -99,6 +100,70 @@ function resetForm() {
 		siteRSS: '',
 		subMail: '',
 	})
+}
+
+async function pasteInfo() {
+	try {
+		const clipboardText = await navigator.clipboard.readText()
+		const lines = clipboardText.split('\n').filter(line => line.trim())
+
+		const info = {
+			name: '',
+			link: '',
+			avatar: '',
+			descr: '',
+			atom: '',
+			mail: '',
+		}
+
+		// 解析剪贴板内容
+		for (const line of lines) {
+			const [key, ...valueParts] = line.split(':')
+			if (key && valueParts.length > 0) {
+				const value = valueParts.join(':').trim()
+				const trimmedKey = key.trim().toLowerCase()
+
+				if (trimmedKey === 'name')
+					info.name = value
+				else if (trimmedKey === 'link')
+					info.link = value
+				else if (trimmedKey === 'avatar')
+					info.avatar = value
+				else if (trimmedKey === 'descr')
+					info.descr = value
+				else if (trimmedKey === 'atom')
+					info.atom = value
+				else if (trimmedKey === 'mail')
+					info.mail = value
+			}
+		}
+
+		// 验证必填字段
+		if (!info.name || !info.link) {
+			showPasteError.value = true
+			setTimeout(() => {
+				showPasteError.value = false
+			}, 5000)
+			return
+		}
+
+		// 填充表单
+		Object.assign(formData, {
+			siteName: info.name,
+			siteLink: info.link,
+			siteAvatar: info.avatar,
+			siteInfo: info.descr,
+			siteRSS: info.atom,
+			subMail: info.mail,
+		})
+	}
+	catch (error) {
+		console.error('读取剪贴板失败:', error)
+		showPasteError.value = true
+		setTimeout(() => {
+			showPasteError.value = false
+		}, 5000)
+	}
 }
 </script>
 
@@ -233,6 +298,12 @@ function resetForm() {
 								{{ submitting ? '提交中...' : '提交申请' }}
 							</div>
 						</button>
+						<button type="button" class="button" @click="pasteInfo">
+							<div class="button-main">
+								<Icon name="ph:clipboard-bold" />
+								粘贴信息
+							</div>
+						</button>
 						<button type="button" class="button" @click="resetForm">
 							<div class="button-main">
 								<Icon name="ph:arrow-counter-clockwise-bold" />
@@ -246,9 +317,20 @@ function resetForm() {
 						<p>友链申请提交成功！我们会尽快审核您的申请，审核结果将通过邮箱通知您。</p>
 					</Alert>
 
-					<!-- 错误消息 -->
+					<!-- 提交错误消息 -->
 					<Alert v-if="showErrorMessage" type="error" title="提交失败">
 						<p>提交失败，请检查网络连接后稍后重试。如果问题持续存在，请联系网站管理员。</p>
+					</Alert>
+
+					<!-- 粘贴错误消息 -->
+					<Alert v-if="showPasteError" type="error" title="粘贴失败">
+						<p>粘贴失败，请检查剪贴板内容格式是否正确。正确格式为：</p>
+						<pre>name: 站点名称
+							link: 站点链接
+							avatar: 头像链接
+							descr: 站点描述
+							atom: RSS链接
+							mail: 邮箱地址</pre>
 					</Alert>
 				</form>
 			</div>
