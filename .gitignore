@@ -26,3 +26,4 @@ logs
 # Custom
 .vercel
 content/article/test.md
+log.txt
