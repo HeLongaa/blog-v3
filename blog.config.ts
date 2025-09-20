@@ -62,7 +62,7 @@ const blogConfig = {
 
 	data: {
 		api_endpoint: 'https://api-blog.helong.online',
-		submit_API: 'https://n8n-trcqhocy.ap-northeast-1.clawcloudrun.com',
+		submit_API: 'https://n8n.helong.online',
 	},
 }
 
