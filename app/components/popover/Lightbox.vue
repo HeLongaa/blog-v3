@@ -17,6 +17,17 @@ const lightboxEl = useCurrentElement<HTMLImageElement>(lightbox)
 
 const { width: winW, height: winH } = useWindowSize()
 
+const bodyRef = ref<HTMLElement | null>(null)
+if (process.client)
+	bodyRef.value = document.body
+const isScrollLocked = useScrollLock(bodyRef)
+watch(() => props.isOpening, (val) => {
+	isScrollLocked.value = !!val
+}, { immediate: true })
+onBeforeUnmount(() => {
+	isScrollLocked.value = false
+})
+
 interface Pointer {
 	startX: number
 	startY: number
@@ -193,7 +204,8 @@ useEventListener('keydown', (e) => {
 #z-lightbox-bgmask {
 	position: fixed;
 	inset: 0;
-	background-color: #0007;
+	overscroll-behavior: contain;
+	backdrop-filter: blur(0.5rem);
 	transition: all var(--delay, 0.2s);
 
 	&.v-enter-from,

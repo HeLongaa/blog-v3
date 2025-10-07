@@ -9,17 +9,19 @@ type LayoutSection = keyof typeof defaultState
 export const useLayoutStore = defineStore('layout', () => {
 	const open = ref({ ...defaultState })
 	const isAnyOpen = computed(() => Object.values(open.value).some(Boolean))
-
+	const translate = ref<Record<string, string>>({})
 	const asideWidgets = ref<WidgetName[]>([])
 
 	// 滚动锁定逻辑
 	const lockScroll = () => {
+		// eslint-disable-next-line node/prefer-global/process
 		if (process.client && document.body) {
 			document.body.style.overflow = 'hidden'
 		}
 	}
 
 	const unlockScroll = () => {
+		// eslint-disable-next-line node/prefer-global/process
 		if (process.client && document.body) {
 			document.body.style.overflow = ''
 		}
@@ -27,6 +29,7 @@ export const useLayoutStore = defineStore('layout', () => {
 
 	// 检查是否为移动端或平板端（宽度小于 1200px）
 	const isMobileOrTablet = () => {
+		// eslint-disable-next-line node/prefer-global/process
 		return process.client && window.innerWidth < 1200
 	}
 
@@ -56,14 +59,17 @@ export const useLayoutStore = defineStore('layout', () => {
 		}
 	}
 
-	const setAside = (widgets?: WidgetName[]) => {
-		if (widgets)
-			asideWidgets.value = widgets ?? []
+	const setAside = (widgets: WidgetName[]) => {
+		asideWidgets.value = widgets
 	}
 
+	const setTranslate = (reason: string, value: string) => {
+		translate.value[reason] = value
+	}
 	const isOpen = (key: LayoutSection) => open.value[key]
 
 	// 监听窗口大小变化，宽屏时解锁滚动
+	// eslint-disable-next-line node/prefer-global/process
 	if (process.client) {
 		const handleResize = () => {
 			if (window.innerWidth >= 1200 && isAnyOpen.value) {
@@ -78,9 +84,11 @@ export const useLayoutStore = defineStore('layout', () => {
 		open,
 		isAnyOpen,
 		asideWidgets,
+		translate,
 		closeAll,
 		toggle,
 		setAside,
+		setTranslate,
 		isOpen,
 	}
 })

@@ -7,6 +7,9 @@ image: https://oss.helong.online/bucket-IMG/78982bbaa34bc0182addfcbc2244a3d25d44
 # type: story
 categories: [工具]
 tags: [工具, n8n]
+references:
+  - title: N8N 官方文档
+    link: https://docs.n8n.io/
 ---
 
 n8n是一款强大且灵活的开源工作流自动化工具。可以通过不同节点的连接自动协同工作。

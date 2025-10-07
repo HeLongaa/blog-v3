@@ -83,9 +83,9 @@ const keycut = computed(() => navigator?.userAgent.includes('Mac OS') ? '⌘K' :
 	position: fixed;
 	inset: 0;
 	////background-color: #0003;
-  //background-color: var(--c-bg-soft);
-  backdrop-filter: blur(0.5rem);
-  transition: opacity 0.2s;
+	/// //background-color: var(--c-bg-soft);
+	backdrop-filter: blur(0.5rem);
+	transition: opacity 0.2s;
 	z-index: 100;
 
 	&.v-enter-from,
