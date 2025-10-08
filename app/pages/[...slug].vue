@@ -2,7 +2,6 @@
 const route = useRoute()
 
 const layoutStore = useLayoutStore()
-layoutStore.setAside(['toc'])
 
 const { data: post } = await useAsyncData(
 	() => route.path,
@@ -27,7 +26,9 @@ if (post.value) {
 		ogImage: post.value.image,
 		description: post.value.description,
 	})
-	layoutStore.setAside(post.value.meta?.aside as WidgetName[])
+	// 如果文章有自定义 aside 配置则使用，否则使用默认的 toc
+	const asideWidgets = post.value.meta?.aside || ['toc']
+	layoutStore.setAside(asideWidgets as WidgetName[])
 }
 else {
 	route.meta.title = '404'
