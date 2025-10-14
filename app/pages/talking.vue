@@ -328,16 +328,21 @@ onUnmounted(() => {
 }
 
 .moments-title {
-  position: sticky;
-  top: 0;
-  margin-bottom: -0.3em;
-  z-index: -1;
-  font: 800 5em/1 var(--font-stroke-free);
-  text-align: center;
   color: transparent;
-  -webkit-text-stroke: 1px var(--c-text-3);
+  font-family: var(--font-stroke-free);
+  font-size: 5em;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: -.3em;
+  -webkit-mask-image: linear-gradient(#fff 50%, transparent);
   mask-image: linear-gradient(#fff 50%, transparent);
-  transition: color 0.2s;
+  opacity: .5;
+  position: sticky;
+  text-align: center;
+  top: 0;
+  transition: color .2s;
+  z-index: -1;
+  -webkit-text-stroke: 1px var(--c-text-3);
 }
 
 .moments-title::selection,

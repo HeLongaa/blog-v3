@@ -90,17 +90,15 @@ const yearlyWordCount = computed(() => {
 }
 
 .archive-title {
-	display: flex;
-
-	// align-items: center;
-	justify-content: space-between;
-	gap: 1em;
-	position: sticky;
-	opacity: 0.5;
-	top: 0;
-	font-size: min(1.5em, 5vw);
 	color: transparent;
-	transition: color 0.2s;
+    display: flex;
+    font-size: 4vw;
+    gap: 1em;
+    justify-content: space-between;
+    opacity: .5;
+    position: sticky;
+    top: 0;
+    transition: color .2s;
 
 	&::selection, :hover > & {
 		color: var(--c-text-3);
