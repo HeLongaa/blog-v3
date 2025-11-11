@@ -19,6 +19,10 @@
 	font-variant-alternates: styleset(open-digits, disambiguation, round-quotes-and-commas);
 	-webkit-tap-highlight-color: var(--c-primary-soft);
 
+	/* 隐藏滚动条但保持滚动功能 */
+	scrollbar-width: none; /* Firefox */
+	-ms-overflow-style: none; /* IE and Edge */
+
 	&:dir(rtl) {
 		--start: right;
 		--end: left;
@@ -40,6 +44,11 @@
 
 *, ::before, ::after {
 	box-sizing: border-box;
+}
+
+/* 隐藏所有元素的滚动条（Chrome, Safari, Opera） */
+*::-webkit-scrollbar {
+	display: none;
 }
 
 ::selection {
