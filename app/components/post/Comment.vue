@@ -333,6 +333,9 @@ onUnmounted(() => {
       }
     }
   }
+  .atk-list>.atk-list-footer{
+    display: none;
+  }
 
   @media (max-width: 576px) {
     .atk-comment-wrap {

@@ -160,34 +160,14 @@ onMounted(() => {
 
 <div class="posts-container">
 	<!-- 初始加载状态 -->
-	<div v-if="initialLoading">
-		<div class="loading-container">
-			<Icon name="ph:circle-notch" class="loading-icon" />
-			<span>正在加载朋友动态...</span>
-		</div>
-
-		<!-- 骨架屏 -->
-		<div class="skeleton-container">
-			<div v-for="i in 3" :key="i" class="skeleton-post">
-				<div class="skeleton-header">
-					<div class="skeleton-avatar" />
-					<div class="skeleton-info">
-						<div class="skeleton-name" />
-						<div class="skeleton-domain" />
-					</div>
-				</div>
-				<div class="skeleton-content">
-					<div class="skeleton-title" />
-					<div class="skeleton-text" />
-					<div class="skeleton-text short" />
-				</div>
-			</div>
-		</div>
+	<div v-if="initialLoading" class="loading-container">
+		<Icon name="ph:circle-notch" class="loading-icon" />
+		<span>正在加载朋友动态...</span>
 	</div>
 
 	<!-- 文章列表 -->
 	<div v-else class="posts-list">
-		<TransitionGroup name="post" tag="div" class="post-grid">
+		<TransitionGroup name="post" tag="div" class="post-grid" appear>
 			<article
 				v-for="(post, index) in displayedPosts"
 				:key="`${post.domain}-${post.title}-${index}`"
@@ -489,7 +469,11 @@ onMounted(() => {
   }
 }
 // 动画
-.post-enter-active,
+.post-enter-active {
+  transition: all 0.5s ease;
+  transition-delay: var(--delay, 0s);
+}
+
 .post-leave-active {
   transition: all 0.5s ease;
 }
@@ -531,86 +515,6 @@ onMounted(() => {
   }
   to {
     transform: rotate(360deg);
-  }
-}
-
-// 骨架屏样式
-.skeleton-container {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-top: 2rem;
-}
-
-.skeleton-post {
-  background: var(--c-bg-soft);
-  border: 1px solid var(--c-border);
-  border-radius: 12px;
-  padding: 1.5rem;
-  animation: skeleton-pulse 1.5s ease-in-out infinite;
-}
-
-.skeleton-header {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.skeleton-avatar {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: var(--c-bg-mute);
-}
-
-.skeleton-info {
-  flex: 1;
-}
-
-.skeleton-name {
-  width: 120px;
-  height: 16px;
-  background: var(--c-bg-mute);
-  border-radius: 4px;
-  margin-bottom: 0.5rem;
-}
-
-.skeleton-domain {
-  width: 80px;
-  height: 12px;
-  background: var(--c-bg-mute);
-  border-radius: 4px;
-}
-
-.skeleton-content {
-  .skeleton-title {
-    width: 90%;
-    height: 20px;
-    background: var(--c-bg-mute);
-    border-radius: 4px;
-    margin-bottom: 0.75rem;
-  }
-
-  .skeleton-text {
-    width: 100%;
-    height: 14px;
-    background: var(--c-bg-mute);
-    border-radius: 4px;
-    margin-bottom: 0.5rem;
-
-    &.short {
-      width: 60%;
-    }
-  }
-}
-
-@keyframes skeleton-pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.6;
   }
 }
 </style>

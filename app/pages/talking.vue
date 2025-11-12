@@ -42,7 +42,21 @@ const loading = ref(false)
 const initialLoading = ref(true)
 const hasMore = ref(true)
 const currentIndex = ref(0)
-const pageSize = 10
+const pageSize = 20
+
+const flattenedMoments = computed(() => {
+	const result: Array<{ moment: DisplayMoment, item: DisplayMoment['moment_list'][0], flatIndex: number }> = []
+	let flatIndex = 0
+
+	displayedMoments.value.forEach((moment) => {
+		moment.moment_list.forEach((item) => {
+			result.push({ moment, item, flatIndex })
+			flatIndex++
+		})
+	})
+
+	return result
+})
 function updateDisplayedMoments() {
 	const endIndex = Math.min(currentIndex.value + pageSize, allMomentsData.value.length)
 	const newMoments = allMomentsData.value.slice(currentIndex.value, endIndex)
@@ -201,38 +215,19 @@ onUnmounted(() => {
 
 <div class="moments-list">
 	<!-- 初始加载状态 -->
-	<div v-if="initialLoading">
-		<div class="loading-container">
-			<Icon name="ph:circle-notch" class="loading-icon" />
-			<span>正在加载瞬间...</span>
-		</div>
-
-		<!-- 骨架屏 -->
-		<div class="skeleton-container">
-			<div v-for="i in 3" :key="i" class="skeleton-moment">
-				<div class="skeleton-header">
-					<div class="skeleton-avatar" />
-					<div class="skeleton-info">
-						<div class="skeleton-name" />
-						<div class="skeleton-date" />
-					</div>
-				</div>
-				<div class="skeleton-content">
-					<div class="skeleton-text" />
-					<div class="skeleton-text short" />
-				</div>
-			</div>
-		</div>
+	<div v-if="initialLoading" class="loading-container">
+		<Icon name="ph:circle-notch" class="loading-icon" />
+		<span>正在加载瞬间...</span>
 	</div>
 
 	<!-- 动态列表 -->
-	<div v-for="(moment, groupIndex) in displayedMoments" v-else :key="`${groupIndex}-${moment.name}`" class="moment-group">
+	<TransitionGroup v-else name="moment" tag="div" appear>
 		<div
-			v-for="(item, index) in moment.moment_list"
-			:key="`${groupIndex}-${index}`"
+			v-for="({ moment, item, flatIndex }) in flattenedMoments"
+			:key="`${moment.name}-${flatIndex}`"
 			class="moment-item card"
 			:class="{ 'is-top': item.is_top }"
-			:style="{ '--delay': `${(groupIndex * moment.moment_list.length + index) * 0.1}s` }"
+			:style="{ 'animation-delay': `${flatIndex * 0.05}s`, '--delay': `${flatIndex * 0.05}s` }"
 		>
 			<!-- 置顶标签 -->
 			<div v-if="item.is_top" class="top-badge">
@@ -289,7 +284,7 @@ onUnmounted(() => {
 				</button>
 			</div>
 		</div>
-	</div>
+	</TransitionGroup>
 </div>
 
 <!-- 加载状态 -->
@@ -615,7 +610,7 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   gap: 0.75rem;
-  // padding: 3rem 2rem;
+  padding: 3rem 2rem;
   color: var(--c-text-2);
   font-size: 1.1rem;
 
@@ -626,75 +621,23 @@ onUnmounted(() => {
   }
 }
 
-// 骨架屏样式
-.skeleton-container {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  margin-top: 2rem;
+// 动画
+.moment-enter-active {
+  transition: all 0.5s ease;
+  transition-delay: var(--delay, 0s);
 }
 
-.skeleton-moment {
-  background: var(--c-bg-soft);
-  border: 1px solid var(--c-border);
-  border-radius: 12px;
-  padding: 1.5rem;
-  animation: skeleton-pulse 1.5s ease-in-out infinite;
+.moment-leave-active {
+  transition: all 0.5s ease;
 }
 
-.skeleton-header {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
+.moment-enter-from {
+  opacity: 0;
+  transform: translateY(30px);
 }
 
-.skeleton-avatar {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: var(--c-bg-mute);
-}
-
-.skeleton-info {
-  flex: 1;
-}
-
-.skeleton-name {
-  width: 100px;
-  height: 16px;
-  background: var(--c-bg-mute);
-  border-radius: 4px;
-  margin-bottom: 0.5rem;
-}
-
-.skeleton-date {
-  width: 60px;
-  height: 12px;
-  background: var(--c-bg-mute);
-  border-radius: 4px;
-}
-
-.skeleton-content {
-  .skeleton-text {
-    width: 100%;
-    height: 14px;
-    background: var(--c-bg-mute);
-    border-radius: 4px;
-    margin-bottom: 0.5rem;
-
-    &.short {
-      width: 70%;
-    }
-  }
-}
-
-@keyframes skeleton-pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.6;
-  }
+.moment-leave-to {
+  opacity: 0;
+  transform: translateY(-30px);
 }
 </style>
