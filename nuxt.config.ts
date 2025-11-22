@@ -36,6 +36,13 @@ export default defineNuxtConfig({
 		},
 	},
 	nitro: {
+		prerender: {
+			ignore: [
+				// 忽略包含百分号的路径（通常是编码后的中文锚点被错误识别为路径）
+				(path: string) => path.includes('%'),
+			],
+			failOnError: false,
+		},
 		routeRules: {
 			...routeRules,
 			// 确保静态资源不被优化处理
@@ -124,7 +131,7 @@ export default defineNuxtConfig({
 			mdc: true,
 		},
 		experimental: {
-			clientDB: true,
+			// clientDB: true,
 		},
 	},
 

@@ -44,12 +44,13 @@ async function submitForm() {
 	showErrorMessage.value = false
 
 	try {
+		const domain = formData.siteLink.replace(/^https?:\/\//, '').replace(/\/$/, '')
 		const formdata = new FormData()
 		formdata.append('站点名称', formData.siteName)
 		formdata.append('站点链接', formData.siteLink)
 		formdata.append('RSS订阅', formData.siteRSS || formData.siteLink)
-		formdata.append('站点图标', formData.siteAvatar || formData.siteLink)
-		formdata.append('站点描述', formData.siteInfo)
+		formdata.append('站点图标', formData.siteAvatar || `https://si.helong.online/${domain}.ico`)
+		formdata.append('站点描述', formData.siteInfo || '点击探索他的世界')
 		formdata.append('你的邮箱', formData.subMail)
 		formdata.append('submittedAt', new Date().toLocaleString('zh-CN', {
 			year: 'numeric',
@@ -229,7 +230,7 @@ async function pasteInfo() {
 								v-model="formData.siteLink"
 								type="url"
 								class="form-input"
-								placeholder="请输入贵站链接"
+								placeholder="请输入贵站链接（链接末尾不需要带/）"
 								required
 							>
 							<button v-if="formData.siteLink" type="button" class="clear-btn" @click="formData.siteLink = ''">
