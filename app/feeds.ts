@@ -5,7 +5,7 @@ import { getFavicon } from './utils/img'
 // 获取邻居数据的异步函数
 async function getNeighborsData() {
 	try {
-		const response = await fetch(`${blogConfig.data.api_endpoint}/link_data.json`)
+		const response = await fetch(`${blogConfig.data.getLinkData}`)
 		if (!response.ok)
 			throw new Error('Failed to fetch neighbors data')
 

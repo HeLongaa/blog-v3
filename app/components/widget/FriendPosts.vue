@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import blogConfig from '~~/blog.config'
 import { decodeHtmlEntities } from '~/utils/html'
-import { getFavicon } from '../../utils/img'
 
 interface FriendPost {
-	domain: string
+	site_name: string
 	title: string
-	date: string
 	link: string
-	content: string
-	author: string
+	time: string
+	readable_time: string
+	timestamp: number
+	description: string
+	icon: string
 }
 
 const dataCacheStore = useDataCacheStore()
@@ -17,8 +18,8 @@ const posts = ref<FriendPost[]>([])
 const loading = ref(true)
 
 function formatDate(dateStr: string) {
-	const date = new Date(dateStr)
-	return date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })
+	const match = dateStr.match(/(\d{2})-(\d{2})\s/)
+	return match ? `${match[1]}月${match[2]}日` : dateStr.substring(5, 10)
 }
 
 async function loadPosts() {
@@ -30,12 +31,12 @@ async function loadPosts() {
 			return
 		}
 
-		const response = await fetch(`${blogConfig.data.api_endpoint}/rss_data.json`)
+		const response = await fetch(`${blogConfig.data.api_endpoint}/freshrss_articles.json`)
 		if (!response.ok)
 			throw new Error('Failed to fetch')
 
 		const allPosts: FriendPost[] = await response.json()
-		allPosts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+		allPosts.sort((a, b) => b.timestamp - a.timestamp)
 		dataCacheStore.setCache('friends-posts', allPosts, 5 * 60 * 1000)
 		posts.value = allPosts.slice(0, 3)
 	}
@@ -65,23 +66,23 @@ onMounted(() => {
 	<div v-else class="friend-posts">
 		<article
 			v-for="post in posts"
-			:key="`${post.domain}-${post.title}`"
+			:key="`${post.site_name}-${post.title}`"
 			class="friend-post"
 		>
 			<div class="post-header">
 				<img
-					:src="getFavicon(post.domain)"
-					:alt="`${post.author}的头像`"
+					:src="post.icon"
+					:alt="`${post.site_name}的头像`"
 					class="avatar"
 					loading="lazy"
 					@error="(e) => { (e.target as HTMLImageElement).src = '/favicon.ico' }"
 				>
 				<div class="post-meta">
 					<div class="author">
-						{{ decodeHtmlEntities(post.author) }}
+						{{ decodeHtmlEntities(post.site_name) }}
 					</div>
 					<div class="time">
-						{{ formatDate(post.date) }}
+						{{ formatDate(post.readable_time) }}
 					</div>
 				</div>
 			</div>

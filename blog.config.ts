@@ -61,8 +61,10 @@ const blogConfig = {
 	],
 
 	data: {
-		api_endpoint: 'https://api-blog.helong.online',
-		submit_API: 'https://n8n.helong.online',
+		api_endpoint: 'https://api.helong.online',
+		Ech0_endpoint: 'https://mm.helong.online',
+		submit_API: 'https://links.helong.online/api/submit_link.php',
+		getLinkData: 'https://links.helong.online/api/get_links.php',
 	},
 }
 

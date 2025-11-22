@@ -7,7 +7,7 @@ const layoutStore = useLayoutStore()
 layoutStore.setAside(['blog-stats', 'friend-posts', 'blog-tech', 'comm-group'])
 
 const { data: postLink } = await useAsyncData('/link', () => queryCollection('content').path('/link').first())
-const feeds = await getFeedGroups()
+const { data: feeds } = await useAsyncData('feeds', () => getFeedGroups(), { default: () => [] })
 
 useSeoMeta({
 	title: '友链',
@@ -35,6 +35,7 @@ const formData = reactive({
 const submitting = ref(false)
 const showSuccessMessage = ref(false)
 const showErrorMessage = ref(false)
+const showWarnMessage = ref(false)
 const showPasteError = ref(false)
 
 async function submitForm() {
@@ -65,18 +66,26 @@ async function submitForm() {
 			redirect: 'follow' as RequestRedirect,
 		}
 
-		const response = await fetch(`${blogConfig.data.submit_API}/webhook/submitLink`, requestOptions)
+		const response = await fetch(`${blogConfig.data.submit_API}`, requestOptions)
 		const responseData = await response.json()
 
-		if (response.ok || responseData?.message === 'Workflow was started') {
+		if (response.ok) {
 			showSuccessMessage.value = true
 			resetForm()
 			setTimeout(() => {
 				showSuccessMessage.value = false
 			}, 4000)
 		}
+		else if (response.status === 409 || responseData?.code === 409) {
+			showWarnMessage.value = true
+			console.error(responseData?.code)
+			resetForm()
+			setTimeout(() => {
+				showWarnMessage.value = false
+			}, 4000)
+		}
 		else {
-			throw new Error(`提交失败: ${response.status} ${response.statusText}. 响应: ${JSON.stringify(responseData)}`)
+			throw new Error(`提交失败: ${responseData?.code} ${response.statusText}. 响应: ${JSON.stringify(responseData)}`)
 		}
 	}
 	catch (error) {
@@ -314,23 +323,27 @@ async function pasteInfo() {
 
 					<!-- 成功消息 -->
 					<Alert v-if="showSuccessMessage" type="tip" title="提交成功">
-						<p>友链申请提交成功！我们会尽快审核您的申请，审核结果将通过邮箱通知您。</p>
+						<p>友链申请提交成功！我会尽快审核您的申请，审核结果将通过邮箱通知您。</p>
 					</Alert>
 
 					<!-- 提交错误消息 -->
 					<Alert v-if="showErrorMessage" type="error" title="提交失败">
 						<p>提交失败，请检查网络连接后稍后重试。如果问题持续存在，请联系网站管理员。</p>
 					</Alert>
+					<Alert v-if="showWarnMessage" type="error" title="409 Conflict">
+						<p>该链接已存在，请勿重复提交!</p>
+					</Alert>
 
 					<!-- 粘贴错误消息 -->
 					<Alert v-if="showPasteError" type="error" title="粘贴失败">
 						<p>粘贴失败，请检查剪贴板内容格式是否正确。正确格式为：</p>
-						<pre>name: 站点名称
-							link: 站点链接
-							avatar: 头像链接
-							descr: 站点描述
-							atom: RSS链接
-							mail: 邮箱地址</pre>
+						<pre>
+        name: 站点名称
+	link: 站点链接
+	avatar: 头像链接
+	descr: 站点描述
+	atom: RSS链接
+	mail: 邮箱地址</pre>
 					</Alert>
 				</form>
 			</div>

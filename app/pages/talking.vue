@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { LazyPopoverLightbox } from '#components'
-import { onMounted, onUnmounted, ref } from 'vue'
+import { computed, h, onMounted, onUnmounted, ref, watch } from 'vue'
+import blogConfig from '~~/blog.config'
 import { decodeHtmlEntities } from '~/utils/html'
+import { getFavicon } from '~/utils/img'
 
 const appConfig = useAppConfig()
 useSeoMeta({
@@ -16,47 +18,208 @@ const dataCacheStore = useDataCacheStore()
 const popoverStore = usePopoverStore()
 
 interface MomentItem {
-	date: string
-	tags: string[]
+	id: number
 	content: string
-	img?: string
-	is_top: boolean
+	username: string
+	layout: string
+	private: boolean
+	user_id: number
+	extension?: string
+	extension_type?: 'WEBSITE' | 'GITHUBPROJ' | 'VIDEO' | 'MUSIC' | 'YOUTUBE'
+	fav_count: number
+	created_at: string
+	images?: {
+		id: number
+		message_id: number
+		image_url: string
+		image_source: string
+	}[]
+	tags?: {
+		id: number
+		name: string
+		usage_count: number
+		created_at: string
+	}[]
 }
 
 interface DisplayMoment {
+	id: number
 	name: string
 	avatar: string
 	avatarLink: string
-	moment_list: {
-		content: string
-		date: string
-		image?: string[]
-		tags?: string[]
-		is_top?: boolean
-	}[]
+	content: string
+	date: string
+	images?: string[]
+	tags?: string[]
+	extension?: string
+	extension_type?: string
+	fav_count: number
+	is_top?: boolean
 }
 
 const allMomentsData = ref<MomentItem[]>([])
 const displayedMoments = ref<DisplayMoment[]>([])
+const githubRepoCache = ref<Record<string, any>>({})
+const videoInfoCache = ref<Record<string, any>>({})
+const youtubeVideoCache = ref<Record<string, any>>({})
+const musicInfoCache = ref<Record<string, any>>({})
 const loading = ref(false)
 const initialLoading = ref(true)
 const hasMore = ref(true)
 const currentIndex = ref(0)
 const pageSize = 20
 
-const flattenedMoments = computed(() => {
-	const result: Array<{ moment: DisplayMoment, item: DisplayMoment['moment_list'][0], flatIndex: number }> = []
-	let flatIndex = 0
+const flattenedMoments = computed(() =>
+	displayedMoments.value.map((moment, index) => ({ moment, flatIndex: index })),
+)
 
-	displayedMoments.value.forEach((moment) => {
-		moment.moment_list.forEach((item) => {
-			result.push({ moment, item, flatIndex })
-			flatIndex++
-		})
-	})
+async function fetchGithubRepoInfo(url: string) {
+	if (!url || githubRepoCache.value[url])
+		return githubRepoCache.value[url] || null
 
-	return result
-})
+	const match = url.match(/github.com\/([^/]+)\/([^/?#]+)/)
+	if (!match) {
+		const defaultInfo = {
+			name: 'GitHub 项目',
+			desc: url,
+			logo: '',
+			stars: 0,
+			forks: 0,
+			url,
+		}
+		githubRepoCache.value[url] = defaultInfo
+		return defaultInfo
+	}
+
+	try {
+		const res = await fetch(`https://api.github.com/repos/${match[1]}/${match[2]}`)
+		if (!res.ok)
+			throw new Error('Failed to fetch')
+
+		const data = await res.json()
+		githubRepoCache.value[url] = {
+			name: data.name,
+			desc: data.description,
+			logo: data.owner?.avatar_url,
+			stars: data.stargazers_count,
+			forks: data.forks_count,
+			url: data.html_url,
+		}
+		return githubRepoCache.value[url]
+	}
+	catch {
+		const defaultInfo = {
+			name: match[2] || 'GitHub 项目',
+			desc: `${match[1]}/${match[2]}`,
+			logo: '',
+			stars: 0,
+			forks: 0,
+			url,
+		}
+		githubRepoCache.value[url] = defaultInfo
+		return defaultInfo
+	}
+}
+
+async function fetchBilibiliVideoInfo(bvid: string) {
+	if (!bvid || videoInfoCache.value[bvid])
+		return videoInfoCache.value[bvid] || null
+
+	try {
+		const result: any = await $fetch(`/api/bilibili-video?bvid=${bvid}`)
+		if (result.code !== 0 || !result.data)
+			return null
+
+		const data = result.data
+		let coverUrl = data.pic || ''
+
+		if (coverUrl) {
+			if (coverUrl.startsWith('//'))
+				coverUrl = `https:${coverUrl}`
+			else if (coverUrl.startsWith('http://'))
+				coverUrl = coverUrl.replace('http://', 'https://')
+			coverUrl = `/api/bilibili-image?url=${encodeURIComponent(coverUrl)}`
+		}
+
+		videoInfoCache.value[bvid] = {
+			title: data.title,
+			desc: data.desc,
+			cover: coverUrl,
+			author: data.owner?.name,
+			duration: data.duration,
+			view: data.stat?.view,
+			bvid: data.bvid,
+		}
+		return videoInfoCache.value[bvid]
+	}
+	catch (error) {
+		console.error('获取视频信息失败:', error)
+		return null
+	}
+}
+
+function isYoutubeVideoId(str: string): boolean {
+	return Boolean(str && !str.startsWith('BV') && !str.startsWith('av') && /^[\w-]{11}$/.test(str))
+}
+
+async function fetchYoutubeVideoInfo(videoId: string) {
+	if (!videoId || youtubeVideoCache.value[videoId])
+		return youtubeVideoCache.value[videoId] || null
+
+	youtubeVideoCache.value[videoId] = {
+		title: 'YouTube 视频',
+		cover: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
+		videoId,
+		url: `https://www.youtube.com/watch?v=${videoId}`,
+	}
+	return youtubeVideoCache.value[videoId]
+}
+
+async function fetchMusicInfo(musicId: string) {
+	if (!musicId || musicInfoCache.value[musicId])
+		return musicInfoCache.value[musicId] || null
+
+	const isUrl = musicId.startsWith('http')
+	const defaultInfo = {
+		title: 'QQ音乐分享',
+		artist: 'QQ音乐',
+		album: '',
+		cover: '',
+		musicId,
+		url: isUrl ? musicId : `https://y.qq.com/n/ryqq/songDetail/${musicId}`,
+	}
+
+	if (isUrl) {
+		musicInfoCache.value[musicId] = defaultInfo
+		return defaultInfo
+	}
+
+	try {
+		const data: any = await $fetch(`/api/qq-music?song_mid=${musicId}`)
+		const info = data?.songinfo?.data?.track_info
+
+		if (info) {
+			const albumMid = info.album?.mid || ''
+			musicInfoCache.value[musicId] = {
+				title: info.name || '音乐分享',
+				artist: info.singer?.map((s: any) => s.name).join(' / ') || 'QQ音乐',
+				album: info.album?.name || '',
+				cover: albumMid ? `https://y.qq.com/music/photo_new/T002R300x300M000${albumMid}.jpg` : '',
+				musicId,
+				url: `https://y.qq.com/n/ryqq/songDetail/${musicId}`,
+			}
+			return musicInfoCache.value[musicId]
+		}
+
+		console.warn('QQ音乐API返回数据格式异常:', data)
+	}
+	catch (error) {
+		console.error('无法从QQ音乐API获取信息:', error)
+	}
+
+	musicInfoCache.value[musicId] = defaultInfo
+	return defaultInfo
+}
 function updateDisplayedMoments() {
 	const endIndex = Math.min(currentIndex.value + pageSize, allMomentsData.value.length)
 	const newMoments = allMomentsData.value.slice(currentIndex.value, endIndex)
@@ -65,36 +228,35 @@ function updateDisplayedMoments() {
 		hasMore.value = false
 		return
 	}
+
 	const displayData: DisplayMoment[] = newMoments.map(item => ({
+		id: item.id,
 		name: appConfig.author.name,
 		avatar: getGhAvatar(appConfig.author.name),
 		avatarLink: '/',
-		moment_list: [{
-			content: item.content,
-			date: formatDate(item.date),
-			image: item.img ? [item.img] : undefined,
-			tags: item.tags,
-			is_top: item.is_top,
-		}],
+		content: item.content,
+		date: formatDate(item.created_at),
+		images: item.images?.map(img =>
+			img.image_url.startsWith('/images/')
+				? `${blogConfig.data.Ech0_endpoint}/api${img.image_url}`
+				: img.image_url,
+		),
+		tags: item.tags?.map(tag => tag.name),
+		extension: item.extension,
+		extension_type: item.extension_type,
+		fav_count: item.fav_count,
+		is_top: false,
 	}))
 
 	displayedMoments.value.push(...displayData)
 	currentIndex.value = endIndex
-
-	if (endIndex >= allMomentsData.value.length) {
-		hasMore.value = false
-	}
+	hasMore.value = endIndex < allMomentsData.value.length
 }
 async function fetchAllMoments(forceRefresh = false) {
 	if (loading.value && !initialLoading.value)
 		return
 
-	if (initialLoading.value) {
-		initialLoading.value = true
-	}
-	else {
-		loading.value = true
-	}
+	loading.value = true
 
 	try {
 		const data = await dataCacheStore.getMoments(forceRefresh)
@@ -113,6 +275,7 @@ async function fetchAllMoments(forceRefresh = false) {
 		initialLoading.value = false
 	}
 }
+
 function loadMore() {
 	if (loading.value || !hasMore.value)
 		return
@@ -121,53 +284,43 @@ function loadMore() {
 	setTimeout(() => {
 		updateDisplayedMoments()
 		loading.value = false
-	}, 300) // 添加轻微延迟以改善用户体验
+	}, 300)
 }
 function formatDate(dateString: string) {
-	const date = new Date(dateString)
-	const now = new Date()
-	const diff = now.getTime() - date.getTime()
-
+	const diff = Date.now() - new Date(dateString).getTime()
 	const minute = 60 * 1000
-	const hour = 60 * minute
-	const day = 24 * hour
-	const month = 30 * day
-	const year = 365 * day
+	const hour = minute * 60
+	const day = hour * 24
+	const month = day * 30
+	const year = day * 365
 
 	if (diff < hour) {
 		const minutes = Math.floor(diff / minute)
 		return minutes <= 0 ? '刚刚' : `${minutes}分钟前`
 	}
-	else if (diff < day) {
-		const hours = Math.floor(diff / hour)
-		return `${hours}小时前`
-	}
-	else if (diff < month) {
-		const days = Math.floor(diff / day)
-		return `${days}天前`
-	}
-	else if (diff < year) {
-		const months = Math.floor(diff / month)
-		return `${months}个月前`
-	}
-	else {
-		return date.toLocaleDateString('zh-CN', {
-			year: 'numeric',
-			month: 'long',
-			day: 'numeric',
-		})
-	}
-}
-function handleScroll() {
-	const scrollTop = window.pageYOffset || document.documentElement.scrollTop
-	const windowHeight = window.innerHeight
-	const documentHeight = document.documentElement.scrollHeight
+	if (diff < day)
+		return `${Math.floor(diff / hour)}小时前`
+	if (diff < month)
+		return `${Math.floor(diff / day)}天前`
+	if (diff < year)
+		return `${Math.floor(diff / month)}个月前`
 
-	if (scrollTop + windowHeight >= documentHeight - 100) {
-		loadMore()
-	}
+	return new Date(dateString).toLocaleDateString('zh-CN', {
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric',
+	})
 }
-function scrollToComment(content: string) {
+
+function handleScroll() {
+	const { scrollTop } = document.documentElement
+	const { innerHeight } = window
+	const { scrollHeight } = document.documentElement
+
+	if (scrollTop + innerHeight >= scrollHeight - 100)
+		loadMore()
+}
+function scrollToComment(moment: DisplayMoment) {
 	const commentSection = document.getElementById('comment-section')
 	if (commentSection) {
 		commentSection.scrollIntoView({ behavior: 'smooth' })
@@ -176,7 +329,7 @@ function scrollToComment(content: string) {
 			const textarea = commentSection.querySelector('textarea')
 			if (textarea) {
 				textarea.focus()
-				textarea.value = `> ${content}\n\n`
+				textarea.value = `> ${moment.content}\n\n`
 				textarea.dispatchEvent(new Event('input', { bubbles: true }))
 			}
 		}, 500)
@@ -192,11 +345,92 @@ function openImageLightbox(event: Event) {
 	}
 }
 
+function handleExtensionClick(moment: DisplayMoment) {
+	if (!moment.extension)
+		return
+
+	const urlMap: Record<string, () => string> = {
+		WEBSITE: () => {
+			try {
+				const data = JSON.parse(moment.extension!)
+				return data.site || moment.extension!
+			}
+			catch {
+				return moment.extension!
+			}
+		},
+		GITHUBPROJ: () =>
+			moment.extension!.startsWith('http')
+				? moment.extension!
+				: `https://github.com/${moment.extension}`,
+		VIDEO: () =>
+			isYoutubeVideoId(moment.extension!)
+				? `https://www.youtube.com/watch?v=${moment.extension}`
+				: `https://www.bilibili.com/video/${moment.extension}`,
+		YOUTUBE: () => `https://www.youtube.com/watch?v=${moment.extension}`,
+		MUSIC: () =>
+			moment.extension!.startsWith('http')
+				? moment.extension!
+				: `https://y.qq.com/n/ryqq/songDetail/${moment.extension}`,
+	}
+
+	try {
+		const getUrl = urlMap[moment.extension_type!]
+		const url = getUrl?.()
+		if (url)
+			window.open(url, '_blank')
+	}
+	catch (error) {
+		console.error('处理扩展内容失败:', error)
+	}
+}
+
+function parseExtensionData(extension?: string) {
+	try {
+		return extension ? JSON.parse(extension) : {}
+	}
+	catch {
+		return { title: '链接', site: extension }
+	}
+}
+
+function getWebsiteIconUrl(url?: string): string {
+	if (!url)
+		return ''
+	try {
+		const urlObj = new URL(url.startsWith('http') ? url : `https://${url}`)
+		return getFavicon(urlObj.hostname) || ''
+	}
+	catch {
+		return ''
+	}
+}
+
 onMounted(() => {
 	fetchAllMoments()
 	window.addEventListener('scroll', handleScroll)
 })
 
+watch(displayedMoments, async (moments) => {
+	const fetchHandlers: Record<string, (ext: string) => Promise<any>> = {
+		GITHUBPROJ: fetchGithubRepoInfo,
+		YOUTUBE: fetchYoutubeVideoInfo,
+		MUSIC: fetchMusicInfo,
+		VIDEO: async (ext: string) => {
+			return isYoutubeVideoId(ext)
+				? fetchYoutubeVideoInfo(ext)
+				: fetchBilibiliVideoInfo(ext)
+		},
+	}
+
+	for (const moment of moments) {
+		if (moment.extension && moment.extension_type) {
+			const handler = fetchHandlers[moment.extension_type]
+			if (handler)
+				await handler(moment.extension)
+		}
+	}
+}, { immediate: true })
 onUnmounted(() => {
 	window.removeEventListener('scroll', handleScroll)
 })
@@ -215,22 +449,21 @@ onUnmounted(() => {
 
 <div class="moments-list">
 	<!-- 初始加载状态 -->
-	<div v-if="initialLoading" class="loading-container">
+	<div v-if="loading" class="loading-indicator">
 		<Icon name="ph:circle-notch" class="loading-icon" />
-		<span>正在加载瞬间...</span>
+		<span>加载中...</span>
 	</div>
 
-	<!-- 动态列表 -->
 	<TransitionGroup v-else name="moment" tag="div" appear>
 		<div
-			v-for="({ moment, item, flatIndex }) in flattenedMoments"
+			v-for="({ moment, flatIndex }) in flattenedMoments"
 			:key="`${moment.name}-${flatIndex}`"
 			class="moment-item card"
-			:class="{ 'is-top': item.is_top }"
-			:style="{ 'animation-delay': `${flatIndex * 0.05}s`, '--delay': `${flatIndex * 0.05}s` }"
+			:class="{ 'is-top': moment.is_top }"
+			:style="{ '--delay': `${(flatIndex % pageSize) * 0.05}s` }"
 		>
 			<!-- 置顶标签 -->
-			<div v-if="item.is_top" class="top-badge">
+			<div v-if="moment.is_top" class="top-badge">
 				<Icon name="ph:push-pin-bold" />
 				置顶
 			</div>
@@ -245,18 +478,170 @@ onUnmounted(() => {
 						<Icon name="ph:seal-check-fill" class="verified" />
 					</div>
 					<div class="moment-date">
-						{{ item.date }}
+						{{ moment.date }}
 					</div>
 				</div>
 			</div>
 
 			<div class="moment-content">
 				<p class="content-text">
-					{{ decodeHtmlEntities(item.content) }}
+					{{ decodeHtmlEntities(moment.content) }}
 				</p>
-				<div v-if="item.image && item.image.length > 0" class="image-grid">
+
+				<!-- 扩展内容渲染 -->
+				<div v-if="moment.extension_type" class="extension-content">
+					<!-- 网站链接 -->
+					<div v-if="moment.extension_type === 'WEBSITE'" class="website-card" @click="handleExtensionClick(moment)">
+						<img
+							v-if="getWebsiteIconUrl(parseExtensionData(moment.extension).site)"
+							:src="getWebsiteIconUrl(parseExtensionData(moment.extension).site)"
+							alt="网站图标"
+							class="website-icon"
+							@error="(e) => (e.target as HTMLImageElement).style.display = 'none'"
+						>
+						<Icon v-else name="ph:globe-simple-bold" class="ext-icon" />
+						<div class="ext-info">
+							<h4 class="ext-title">
+								{{ parseExtensionData(moment.extension).title || '网站链接' }}
+							</h4>
+							<p class="ext-url">
+								{{ parseExtensionData(moment.extension).site }}
+							</p>
+						</div>
+					</div>					<!-- GitHub项目卡片（自动拉取信息） -->
+					<div v-else-if="moment.extension_type === 'GITHUBPROJ'" class="github-card" @click="handleExtensionClick(moment)">
+						<img
+							v-if="moment.extension && githubRepoCache[moment.extension]?.logo"
+							:src="githubRepoCache[moment.extension].logo"
+							alt="logo"
+							class="github-logo"
+						>
+						<div class="ext-info">
+							<h4 class="ext-title">
+								{{ moment.extension && githubRepoCache[moment.extension]?.name || 'GitHub 项目' }}
+							</h4>
+							<p class="ext-desc">
+								{{ moment.extension && githubRepoCache[moment.extension]?.desc }}
+							</p>
+							<div class="ext-meta">
+								<span v-if="moment.extension && githubRepoCache[moment.extension]?.stars !== undefined" class="ext-star">
+									<Icon name="ph:star-bold" /> {{ moment.extension && githubRepoCache[moment.extension]?.stars }}
+								</span>
+								<span v-if="moment.extension && githubRepoCache[moment.extension]?.forks !== undefined" class="ext-fork">
+									<Icon name="ph:git-fork" /> {{ moment.extension && githubRepoCache[moment.extension]?.forks }}
+								</span>
+							</div>
+						</div>
+					</div>
+
+					<!-- 视频 (B站 或 YouTube) -->
+					<div v-else-if="moment.extension_type === 'VIDEO'" class="video-card" :class="{ 'youtube-card': moment.extension && isYoutubeVideoId(moment.extension) }" @click="handleExtensionClick(moment)">
+						<!-- YouTube 视频 -->
+						<template v-if="moment.extension && isYoutubeVideoId(moment.extension)">
+							<div v-if="youtubeVideoCache[moment.extension]?.cover" class="video-preview">
+								<img
+									:src="youtubeVideoCache[moment.extension].cover"
+									alt="视频封面"
+									class="video-cover"
+									loading="lazy"
+									@error="(e) => (e.target as HTMLImageElement).style.display = 'none'"
+								>
+								<div class="play-overlay">
+									<Icon name="ph:play-circle-fill" class="play-icon" />
+								</div>
+								<div class="youtube-badge">
+									<Icon name="simple-icons:youtube" />
+								</div>
+							</div>
+							<div v-else class="video-icon-placeholder">
+								<Icon name="simple-icons:youtube" class="ext-icon youtube-icon" />
+							</div>
+							<div class="ext-info">
+								<h4 class="ext-title">
+									{{ youtubeVideoCache[moment.extension]?.title || 'YouTube 视频' }}
+								</h4>
+								<p class="ext-url">
+									{{ moment.extension }}
+								</p>
+							</div>
+						</template>
+						<!-- B站视频 -->
+						<template v-else>
+							<div v-if="moment.extension && videoInfoCache[moment.extension]?.cover" class="video-preview">
+								<img
+									:src="videoInfoCache[moment.extension].cover"
+									alt="视频封面"
+									class="video-cover"
+									loading="lazy"
+									@error="(e) => (e.target as HTMLImageElement).style.display = 'none'"
+								>
+								<div class="play-overlay">
+									<Icon name="ph:play-circle-fill" class="play-icon" />
+								</div>
+							</div>
+							<div v-else class="video-icon-placeholder">
+								<Icon name="ph:play-circle-bold" class="ext-icon" />
+							</div>
+							<div class="ext-info">
+								<h4 class="ext-title">
+									{{ moment.extension && videoInfoCache[moment.extension]?.title || '视频分享' }}
+								</h4>
+								<p v-if="moment.extension && videoInfoCache[moment.extension]?.author" class="ext-author">
+									<Icon name="ph:user-circle" /> {{ moment.extension && videoInfoCache[moment.extension].author }}
+								</p>
+								<p v-else class="ext-url">
+									{{ moment.extension }}
+								</p>
+							</div>
+						</template>
+					</div>
+
+					<!-- YouTube视频 -->
+					<div v-else-if="moment.extension_type === 'YOUTUBE'" class="video-card youtube-card" @click="handleExtensionClick(moment)">
+						<div v-if="moment.extension && youtubeVideoCache[moment.extension]?.cover" class="video-preview">
+							<img
+								:src="youtubeVideoCache[moment.extension].cover"
+								alt="视频封面"
+								class="video-cover"
+								loading="lazy"
+								@error="(e) => (e.target as HTMLImageElement).style.display = 'none'"
+							>
+							<div class="play-overlay">
+								<Icon name="ph:play-circle-fill" class="play-icon" />
+							</div>
+							<div class="youtube-badge">
+								<Icon name="simple-icons:youtube" />
+							</div>
+						</div>
+						<div v-else class="video-icon-placeholder">
+							<Icon name="simple-icons:youtube" class="ext-icon youtube-icon" />
+						</div>
+						<div class="ext-info">
+							<h4 class="ext-title">
+								{{ moment.extension && youtubeVideoCache[moment.extension]?.title || 'YouTube 视频' }}
+							</h4>
+							<p class="ext-url">
+								{{ moment.extension }}
+							</p>
+						</div>
+					</div>
+
+					<!-- 音乐 -->
+					<div v-else-if="moment.extension_type === 'MUSIC'" class="music-card" @click="handleExtensionClick(moment)">
+						<Icon name="ph:music-note-bold" class="ext-icon" />
+						<div class="ext-info">
+							<h4 class="ext-title">
+								{{ moment.extension && musicInfoCache[moment.extension]?.title || '音乐分享' }}
+							</h4>
+							<p v-if="moment.extension && musicInfoCache[moment.extension]?.artist" class="ext-artist">
+								<Icon name="ph:user-sound" /> {{ musicInfoCache[moment.extension].artist }}
+							</p>
+						</div>
+					</div>
+				</div>				<!-- 图片网格 -->
+				<div v-if="moment.images && moment.images.length > 0" class="image-grid">
 					<figure
-						v-for="(img, imgIndex) in item.image"
+						v-for="(img, imgIndex) in moment.images"
 						:key="imgIndex"
 						class="grid-item image"
 						@click="openImageLightbox"
@@ -273,14 +658,19 @@ onUnmounted(() => {
 
 			<div class="moment-bottom">
 				<div class="moment-meta-info">
-					<div v-if="item.tags && item.tags.length > 0" class="moment-tags">
-						<span v-for="tag in item.tags" :key="tag" class="tag">
+					<div v-if="moment.tags && moment.tags.length > 0" class="moment-tags">
+						<span v-for="tag in moment.tags" :key="tag" class="tag">
 							<Icon name="ph:tag-bold" /> {{ tag }}
 						</span>
 					</div>
+					<div class="moment-actions">
+						<span v-if="moment.fav_count > 0" class="fav-count">
+							<Icon name="ph:heart-bold" /> {{ moment.fav_count }}
+						</span>
+					</div>
 				</div>
-				<button class="comment-btn" @click="scrollToComment(item.content)">
-					<Icon name="hugeicons:comment-01" />
+				<button class="comment-btn" @click="scrollToComment(moment)">
+					<Icon name="iconify i-ph:chat-circle-dots-duotone" />
 				</button>
 			</div>
 		</div>
@@ -288,10 +678,6 @@ onUnmounted(() => {
 </div>
 
 <!-- 加载状态 -->
-<div v-if="loading" class="loading-indicator">
-	<Icon name="ph:circle-notch" class="loading-icon" />
-	<span>加载中...</span>
-</div>
 <div v-if="!hasMore && displayedMoments.length > 0" class="no-more">
 	<Icon name="ph:check-circle-bold" />
 	<span>已加载全部动态</span>
@@ -356,6 +742,25 @@ onUnmounted(() => {
 
 .moment-item {
   padding: .9rem;
+}
+
+.moment-enter-active {
+  transition: all 0.5s ease;
+  transition-delay: var(--delay, 0s);
+}
+
+.moment-leave-active {
+  transition: all 0.5s ease;
+}
+
+.moment-enter-from {
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.moment-leave-to {
+  opacity: 0;
+  transform: translateY(-30px);
 }
 
 .top-badge {
@@ -485,20 +890,18 @@ onUnmounted(() => {
 .moment-bottom {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-top: auto; /* 让底部区域自动推到底部 */
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.75rem;
-  }
+  align-items: flex-start;
+  margin-top: auto;
+  margin-right: 0.5rem;
+  position: relative;
+  min-height: 3rem;
 }
 
 .moment-meta-info {
   display: flex;
   gap: 0.5rem;
   flex-wrap: wrap;
+  padding-right: 4rem;
 }
 
 .moment-tags {
@@ -532,7 +935,10 @@ onUnmounted(() => {
 }
 
 .comment-btn {
-  background-color: var(--c-bg-2);;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background-color: var(--c-bg-2);
   border-radius: 8px;
   padding: 0.5rem 0.75rem;
   cursor: pointer;
@@ -542,14 +948,11 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 0.25rem;
+  border: none;
+
   &:hover {
     background: var(--c-primary);
     color: var(--c-bg);
-  }
-
-  @media (max-width: 768px) {
-    width: 100%;
-    justify-content: center;
   }
 }
 
@@ -584,7 +987,333 @@ onUnmounted(() => {
   }
 }
 
-@keyframes float-in {
+// 扩展内容样式
+.extension-content {
+  margin: 1rem 0.5rem 0.5rem 0.5rem;
+
+  .website-card,
+  .github-card,
+  .video-card,
+  .music-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: var(--c-bg-2);
+    border: 1px solid var(--c-border-soft);
+    border-radius: 12px;
+    padding: 1rem;
+    cursor: pointer;
+
+    &:hover {
+      background: var(--c-bg-2);
+      border-color: var(--c-brand);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .ext-icon {
+      font-size: 2.5rem;
+      flex-shrink: 0;
+    }
+
+    .ext-info {
+      flex: 1;
+      min-width: 0;
+
+      .ext-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--c-text-1);
+        margin: 0 0 0.25rem 0;
+        line-height: 1.2;
+      }
+
+      .ext-url {
+        font-size: 0.9rem;
+        color: var(--c-text-2);
+        margin: 0;
+        word-break: break-all;
+        line-height: 1.3;
+      }
+    }
+  }
+
+  .website-card {
+		.website-icon {
+			width: 48px;
+			height: 48px;
+			flex-shrink: 0;
+			object-fit: contain;
+			border-radius: 8px;
+		}
+
+		.ext-icon {
+			color: #2563eb;
+		}
+	}
+
+	.github-card .ext-icon {
+		color: #333;
+		@media (prefers-color-scheme: dark) {
+			color: var(--c-text-2);
+		}
+	}
+
+.github-card {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	background: var(--c-bg-2);
+	border: 1px solid var(--c-border-soft);
+	border-radius: 12px;
+	padding: 1rem;
+	cursor: pointer;
+	box-sizing: border-box;
+
+	&:hover {
+		background: var(--c-bg-2);
+		border-color: var(--c-brand);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+	}
+
+	.github-logo {
+		width: 48px;
+		height: 48px;
+		border-radius: 8px;
+		object-fit: contain;
+		background: #fff;
+		border: 1px solid var(--c-border);
+		margin-right: 1rem;
+		flex-shrink: 0;
+	}
+
+	.ext-info {
+		flex: 1;
+		min-width: 0;
+
+		.ext-title {
+			font-size: 1.1rem;
+			font-weight: 700;
+			color: var(--c-text-1);
+			margin: 0 0 0.25rem 0;
+			line-height: 1.2;
+		}
+		.ext-desc {
+			font-size: 0.95rem;
+			color: var(--c-text-2);
+			margin: 0 0 0.5rem 0;
+			line-height: 1.3;
+			word-break: break-all;
+		}
+		.ext-meta {
+			display: flex;
+			gap: 1.2em;
+			align-items: center;
+			font-size: 0.95rem;
+			color: var(--c-text-3);
+			.ext-star, .ext-fork {
+				display: inline-flex;
+				align-items: center;
+				gap: 0.3em;
+				svg {
+					font-size: 1em;
+					color: #ffb300;
+				}
+			}
+			.ext-fork svg {
+				color: #8e8e8e;
+			}
+		}
+	}
+}
+
+  .video-card {
+		position: relative;
+
+		&.youtube-card .video-preview .youtube-badge {
+			position: absolute;
+			bottom: 8px;
+			right: 8px;
+			background: #ff0000;
+			color: white;
+			padding: 4px 8px;
+			border-radius: 4px;
+			display: flex;
+			align-items: center;
+			gap: 4px;
+			font-size: 0.75rem;
+			font-weight: 600;
+			z-index: 1;
+		}
+
+		.youtube-icon {
+			color: #ff0000;
+		}
+
+		.video-preview {
+			position: relative;
+			width: 160px;
+			height: 100px;
+			flex-shrink: 0;
+			border-radius: 8px;
+			overflow: hidden;
+			background: var(--c-bg-mute);
+
+			.video-cover {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+				display: block;
+			}
+
+			.play-overlay {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				background: rgba(0, 0, 0, 0.3);
+
+				.play-icon {
+					font-size: 3rem;
+					color: white;
+					opacity: 0.9;
+				}
+			}
+
+			&:hover .play-overlay {
+				background: rgba(0, 0, 0, 0.5);
+
+				.play-icon {
+					opacity: 1;
+				}
+			}
+		}
+
+		.video-icon-placeholder {
+			width: 160px;
+			height: 100px;
+			flex-shrink: 0;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			background: var(--c-bg-mute);
+			border-radius: 8px;
+		}
+
+		.ext-icon {
+			color: #ff6b6b;
+		}
+
+		.ext-author {
+			display: flex;
+			align-items: center;
+			gap: 0.25rem;
+			font-size: 0.85rem;
+			color: var(--c-text-3);
+			margin: 0.25rem 0 0 0;
+		}
+	}
+
+  .music-card {
+		.ext-icon {
+			color: #10b981;
+		}
+
+		.ext-artist {
+			display: flex;
+			align-items: center;
+			gap: 0.25rem;
+			font-size: 0.85rem;
+			color: var(--c-text-3);
+			margin: 0.25rem 0 0 0;
+
+			svg {
+				font-size: 1em;
+			}
+		}
+	}
+
+  @media (max-width: 768px) {
+    margin: 0.75rem 0 0.25rem 0;
+
+    .website-card,
+    .github-card,
+    .video-card,
+    .music-card {
+      padding: 0.75rem;
+      gap: 0.75rem;
+
+      .ext-icon {
+        font-size: 2rem;
+      }
+
+      .ext-info {
+        .ext-title {
+          font-size: 0.9rem;
+        }
+
+        .ext-url {
+          font-size: 0.8rem;
+        }
+
+				.ext-author {
+					font-size: 0.8rem;
+				}
+      }
+    }
+
+		.video-card {
+			.video-preview {
+				width: 120px;
+				height: 75px;
+
+				.play-overlay .play-icon {
+					font-size: 2.5rem;
+				}
+			}
+
+			.video-icon-placeholder {
+				width: 120px;
+				height: 75px;
+			}
+		}
+
+  }
+}
+
+// 动作按钮样式
+.moment-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  .fav-count {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: var(--c-text-3);
+    font-size: 0.9rem;
+
+    svg {
+      color: #ff6b6b;
+    }
+  }
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+@keyframes fade-in {
   from {
     opacity: 0;
     transform: translateY(20px);
@@ -604,7 +1333,6 @@ onUnmounted(() => {
   }
 }
 
-// 加载样式
 .loading-container {
   display: flex;
   align-items: center;
@@ -619,25 +1347,5 @@ onUnmounted(() => {
     animation: spin 1s linear infinite;
     color: var(--c-brand);
   }
-}
-
-// 动画
-.moment-enter-active {
-  transition: all 0.5s ease;
-  transition-delay: var(--delay, 0s);
-}
-
-.moment-leave-active {
-  transition: all 0.5s ease;
-}
-
-.moment-enter-from {
-  opacity: 0;
-  transform: translateY(30px);
-}
-
-.moment-leave-to {
-  opacity: 0;
-  transform: translateY(-30px);
 }
 </style>

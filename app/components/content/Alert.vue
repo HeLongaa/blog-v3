@@ -58,7 +58,7 @@ const title = computed(() => props.title || typeMap[props.type].title)
 <style lang="scss" scoped>
 .alert {
 	margin: 1em 0;
-	padding: 0.2em 0.8em;
+	padding: 0.8em 0.8em;
 	background-image:
 		radial-gradient(circle at 4em -25em, var(--c-primary), transparent 30em),
 		linear-gradient(var(--c-primary) -2000%, transparent);

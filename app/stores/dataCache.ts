@@ -7,11 +7,28 @@ interface CachedData<T = any> {
 }
 
 interface MomentItem {
-	date: string
-	tags: string[]
+	id: number
 	content: string
-	img?: string
-	is_top: boolean
+	username: string
+	layout: string
+	private: boolean
+	user_id: number
+	extension?: string
+	extension_type?: 'WEBSITE' | 'GITHUBPROJ' | 'VIDEO' | 'MUSIC'
+	fav_count: number
+	created_at: string
+	images?: {
+		id: number
+		message_id: number
+		image_url: string
+		image_source: string
+	}[]
+	tags?: {
+		id: number
+		name: string
+		usage_count: number
+		created_at: string
+	}[]
 }
 
 interface FriendPost {
@@ -77,49 +94,27 @@ export const useDataCacheStore = defineStore('dataCache', {
 			return true
 		},
 
-		// 瞬间数据缓存方法
-		async getMoments(forceRefresh = false): Promise<MomentItem[]> {
-			const cacheKey = 'moments-data'
-
-			if (!forceRefresh && this.hasValidCache(cacheKey)) {
-				return this.getCache<MomentItem[]>(cacheKey) || []
-			}
-
+		// 眨间数据获取方法
+		async getMoments(_forceRefresh = false): Promise<MomentItem[]> {
 			try {
-				const response = await $fetch<MomentItem[]>(`${blogConfig.data.api_endpoint}/talk_data.json`)
-				if (response && response.length > 0) {
-					// 按是否置顶和日期排序
-					const sortedData = response.sort((a, b) => {
-						if (a.is_top && !b.is_top)
-							return -1
-						if (!a.is_top && b.is_top)
-							return 1
-						return new Date(b.date).getTime() - new Date(a.date).getTime()
-					})
-
-					this.setCache(cacheKey, sortedData, 3 * 60 * 1000) // 3分钟缓存
-					return sortedData
+				const response = await $fetch<any>(`${blogConfig.data.Ech0_endpoint}/api/echo/page`)
+				if (response && response.code === 1 && response.data && response.data.items) {
+					// 按ID降序排列（新的在前）
+					return (response.data.items as MomentItem[]).sort((a: MomentItem, b: MomentItem) => b.id - a.id)
 				}
 				return []
 			}
 			catch (error) {
-				console.error('获取瞬间数据失败:', error)
+				console.error('获取眨间数据失败:', error)
 				return []
 			}
 		},
 
-		// 朋友动态数据缓存方法
-		async getFriendPosts(forceRefresh = false): Promise<FriendPost[]> {
-			const cacheKey = 'friend-posts-data'
-
-			if (!forceRefresh && this.hasValidCache(cacheKey)) {
-				return this.getCache<FriendPost[]>(cacheKey) || []
-			}
-
+		// 朋友动态数据获取方法
+		async getFriendPosts(_forceRefresh = false): Promise<FriendPost[]> {
 			try {
 				const response = await $fetch<FriendPost[]>('/api/friends')
 				if (response && response.length > 0) {
-					this.setCache(cacheKey, response, 5 * 60 * 1000) // 5分钟缓存
 					return response
 				}
 				return []

@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import blogConfig from '~~/blog.config'
 import { decodeHtmlEntities, stripHtmlAndDecode } from '~/utils/html'
-import { getFavicon } from '~/utils/img'
 
 interface FriendPost {
-	domain: string
+	site_name: string
 	title: string
-	date: string
 	link: string
-	content: string
-	author: string
+	time: string
+	readable_time: string
+	timestamp: number
+	description: string
+	icon: string
 }
 
 const layoutStore = useLayoutStore()
@@ -22,7 +23,6 @@ useSeoMeta({
 	description: '来自朋友们的最新文章动态',
 })
 
-// 数据状态
 const allPosts = ref<FriendPost[]>([])
 const displayedPosts = ref<FriendPost[]>([])
 const loading = ref(false)
@@ -31,15 +31,8 @@ const hasMore = ref(true)
 const currentIndex = ref(0)
 const pageSize = 20
 
-// 格式化时间
 function formatDate(dateStr: string) {
-	return new Date(dateStr).toLocaleDateString('zh-CN', {
-		year: 'numeric',
-		month: 'short',
-		day: 'numeric',
-		hour: '2-digit',
-		minute: '2-digit',
-	})
+	return dateStr.replace('T', ' ').substring(0, 16)
 }
 
 function updateDisplayedPosts() {
@@ -53,64 +46,46 @@ function updateDisplayedPosts() {
 
 	displayedPosts.value.push(...newPosts)
 	currentIndex.value = endIndex
-
-	if (endIndex >= allPosts.value.length) {
-		hasMore.value = false
-	}
+	hasMore.value = endIndex < allPosts.value.length
 }
 
-// 加载所有文章数据
 async function loadAllPosts(forceRefresh = false) {
-	if (!initialLoading.value) {
+	if (!initialLoading.value)
 		loading.value = true
+
+	const resetState = (posts: FriendPost[] = []) => {
+		allPosts.value = posts
+		displayedPosts.value = []
+		currentIndex.value = 0
+		hasMore.value = posts.length > 0
+		if (posts.length > 0)
+			updateDisplayedPosts()
 	}
 
 	try {
-		// 尝试从缓存获取数据
 		const cachedData = dataCacheStore.getCache<FriendPost[]>('friends-posts')
 		if (!forceRefresh && cachedData) {
-			allPosts.value = cachedData
-			displayedPosts.value = []
-			currentIndex.value = 0
-			hasMore.value = cachedData.length > 0
-			updateDisplayedPosts()
+			resetState(cachedData)
 			return
 		}
 
-		const response = await fetch(`${blogConfig.data.api_endpoint}/rss_data.json`)
+		const response = await fetch(`${blogConfig.data.api_endpoint}/freshrss_articles.json`)
 		if (!response.ok)
 			throw new Error('Failed to fetch')
 
 		const data = await response.json()
-
-		if (data && Array.isArray(data)) {
-			// 按日期排序
-			const sortedData = data.sort((a: FriendPost, b: FriendPost) =>
-				new Date(b.date).getTime() - new Date(a.date).getTime(),
-			)
-
-			allPosts.value = sortedData
-			dataCacheStore.setCache('friends-posts', sortedData, 5 * 60 * 1000) // 5分钟缓存
-
-			// 重置显示状态
-			displayedPosts.value = []
-			currentIndex.value = 0
-			hasMore.value = sortedData.length > 0
-
-			// 加载第一页
-			updateDisplayedPosts()
+		if (Array.isArray(data)) {
+			const sortedData = data.sort((a: FriendPost, b: FriendPost) => b.timestamp - a.timestamp)
+			dataCacheStore.setCache('friends-posts', sortedData, 5 * 60 * 1000)
+			resetState(sortedData)
 		}
 		else {
-			allPosts.value = []
-			displayedPosts.value = []
-			hasMore.value = false
+			resetState()
 		}
 	}
 	catch (error) {
 		console.error('获取朋友动态失败:', error)
-		allPosts.value = []
-		displayedPosts.value = []
-		hasMore.value = false
+		resetState()
 	}
 	finally {
 		loading.value = false
@@ -118,7 +93,6 @@ async function loadAllPosts(forceRefresh = false) {
 	}
 }
 
-// 加载更多
 function loadMore() {
 	if (loading.value || !hasMore.value)
 		return
@@ -130,22 +104,14 @@ function loadMore() {
 	}, 300)
 }
 
-// 滚动加载
-
-const { arrivedState } = useScroll(window, {
-	offset: { bottom: 100 },
-})
+const { arrivedState } = useScroll(window, { offset: { bottom: 100 } })
 
 watch(() => arrivedState.bottom, (isBottom) => {
-	if (isBottom) {
+	if (isBottom)
 		loadMore()
-	}
 })
 
-// 初始加载
-onMounted(() => {
-	loadAllPosts()
-})
+onMounted(() => loadAllPosts())
 </script>
 
 <template>
@@ -159,18 +125,16 @@ onMounted(() => {
 </header>
 
 <div class="posts-container">
-	<!-- 初始加载状态 -->
 	<div v-if="initialLoading" class="loading-container">
 		<Icon name="ph:circle-notch" class="loading-icon" />
 		<span>正在加载朋友动态...</span>
 	</div>
 
-	<!-- 文章列表 -->
 	<div v-else class="posts-list">
 		<TransitionGroup name="post" tag="div" class="post-grid" appear>
 			<article
 				v-for="(post, index) in displayedPosts"
-				:key="`${post.domain}-${post.title}-${index}`"
+				:key="`${post.site_name}-${post.title}-${index}`"
 				class="post-card card"
 				:style="{ '--delay': `${(index % pageSize) * 0.05}s` }"
 			>
@@ -183,55 +147,47 @@ onMounted(() => {
 					<div class="post-main">
 						<div class="post-header">
 							<img
-								:src="getFavicon(post.domain)"
-								:alt="`${post.author} avatar`"
+								:src="post.icon"
+								:alt="`${post.site_name} avatar`"
 								class="author-avatar"
 								loading="lazy"
 								@error="(e: Event) => {
 									const img = e.target as HTMLImageElement;
-									if (img && img.src.includes('site-img.helong.online')) {
-										img.src = `https://api.jiangcheng.site/api/favicon?url=${post.domain}`
-									}
-									else if (img && img.src.includes('api.jiangcheng.site')) {
-										img.src = '/favicon.ico'
-									}
+									if (img) img.src = '/favicon.ico'
 								}"
 							>
 							<div class="author-info">
 								<div class="author-details">
-									<h3 class="author-name">{{ decodeHtmlEntities(post.author) }}</h3>
-									<p class="post-domain">{{ post.domain }}</p>
+									<h3 class="author-name">{{ decodeHtmlEntities(post.site_name) }}</h3>
+									<p class="post-domain">{{ post.link.match(/:\/\/([^/]+)/)?.[1] || '' }}</p>
 								</div>
 							</div>
 						</div>
 
 						<div class="post-content">
 							<h2 class="post-title">{{ decodeHtmlEntities(post.title) }}</h2>
-							<p v-if="post.content" class="post-excerpt">
-								{{ stripHtmlAndDecode(post.content).substring(0, 150) }}{{ post.content.length > 150 ? '...' : '' }}
+							<p v-if="post.description" class="post-excerpt">
+								{{ stripHtmlAndDecode(post.description).substring(0, 150) }}{{ post.description.length > 150 ? '...' : '' }}
 							</p>
 						</div>
 					</div>
 
-					<time class="post-date">{{ formatDate(post.date) }}</time>
+					<time class="post-date">{{ formatDate(post.readable_time) }}</time>
 				</a>
 			</article>
 		</TransitionGroup>
 	</div>
 
-	<!-- 加载更多 -->
 	<div v-if="loading && !initialLoading" class="loading-more">
 		<Icon name="ph:circle-notch" class="loading-icon" />
 		<span>加载更多...</span>
 	</div>
 
-	<!-- 没有更多 -->
 	<div v-if="!hasMore && displayedPosts.length > 0" class="no-more">
 		<Icon name="ph:check-circle-bold" />
 		<span>已加载全部动态</span>
 	</div>
 
-	<!-- 空状态 -->
 	<div v-if="!initialLoading && !loading && displayedPosts.length === 0" class="empty-state">
 		<Icon name="ph:smiley-sad" />
 		<p>暂时没有朋友动态</p>
@@ -468,7 +424,7 @@ onMounted(() => {
     transform: translateY(0);
   }
 }
-// 动画
+
 .post-enter-active {
   transition: all 0.5s ease;
   transition-delay: var(--delay, 0s);

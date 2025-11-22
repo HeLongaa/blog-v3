@@ -195,7 +195,7 @@ onUnmounted(() => {
 <template>
 <section class="z-comment">
 	<h3 class="text-creative">
-		<Icon name="i-hugeicons:comment-01" class="comment-tip" />评论
+		<Icon name="iconify i-ph:chat-circle-dots-duotone" class="comment-tip" />评论
 	</h3>
 	<div id="artalk">
 		<p class="loading-box">
