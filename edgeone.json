@@ -18,5 +18,12 @@
       ],
       "source": "/zhilu.opml"
     }
+  ],
+  "redirects": [
+    {
+      "destination": "https://www.zhilu.site/api/icon",
+      "source": "/favicon.ico",
+      "status": 308
+    }
   ]
 }
