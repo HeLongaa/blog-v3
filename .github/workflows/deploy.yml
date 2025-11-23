@@ -15,13 +15,17 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '22.18.0'  # 匹配您的 Node.js 版本
+        node-version: '22'  # 使用主版本号，让 GitHub 自动选择最新
         cache: 'pnpm'
 
     - name: Install pnpm
-      uses: pnpm/action-setup@v2
-      with:
-        version: '10.15.0'  # 匹配您的 pnpm 版本
+      run: npm install -g pnpm@10.15.0  # 直接使用 npm 安装 pnpm
+
+    - name: Verify installations
+      run: |
+        node -v
+        npm -v
+        pnpm -v
 
     - name: Install dependencies
       run: pnpm install
@@ -30,7 +34,7 @@ jobs:
       run: pnpm generate
 
     - name: List dist directory (for debugging)
-      run: ls -la dist/
+      run: ls -la
       if: success()
 
     - name: Deploy to FTP
