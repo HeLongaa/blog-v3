@@ -14,7 +14,7 @@ interface MomentItem {
 	private: boolean
 	user_id: number
 	extension?: string
-	extension_type?: 'WEBSITE' | 'GITHUBPROJ' | 'VIDEO' | 'MUSIC'
+	extension_type?: 'WEBSITE' | 'GITHUBPROJ' | 'VIDEO' | 'YOUTUBE'
 	fav_count: number
 	created_at: string
 	images?: {

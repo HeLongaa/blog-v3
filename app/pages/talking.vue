@@ -2,6 +2,7 @@
 import { LazyPopoverLightbox } from '#components'
 import { computed, h, onMounted, onUnmounted, ref, watch } from 'vue'
 import blogConfig from '~~/blog.config'
+import VideoEmbed from '~/components/content/VideoEmbed.vue'
 import { decodeHtmlEntities } from '~/utils/html'
 import { getFavicon } from '~/utils/img'
 
@@ -25,7 +26,7 @@ interface MomentItem {
 	private: boolean
 	user_id: number
 	extension?: string
-	extension_type?: 'WEBSITE' | 'GITHUBPROJ' | 'VIDEO' | 'MUSIC' | 'YOUTUBE'
+	extension_type?: 'WEBSITE' | 'GITHUBPROJ' | 'VIDEO' | 'YOUTUBE'
 	fav_count: number
 	created_at: string
 	images?: {
@@ -60,9 +61,6 @@ interface DisplayMoment {
 const allMomentsData = ref<MomentItem[]>([])
 const displayedMoments = ref<DisplayMoment[]>([])
 const githubRepoCache = ref<Record<string, any>>({})
-const videoInfoCache = ref<Record<string, any>>({})
-const youtubeVideoCache = ref<Record<string, any>>({})
-const musicInfoCache = ref<Record<string, any>>({})
 const loading = ref(false)
 const initialLoading = ref(true)
 const hasMore = ref(true)
@@ -121,105 +119,10 @@ async function fetchGithubRepoInfo(url: string) {
 	}
 }
 
-async function fetchBilibiliVideoInfo(bvid: string) {
-	if (!bvid || videoInfoCache.value[bvid])
-		return videoInfoCache.value[bvid] || null
-
-	try {
-		const result: any = await $fetch(`/api/bilibili-video?bvid=${bvid}`)
-		if (result.code !== 0 || !result.data)
-			return null
-
-		const data = result.data
-		let coverUrl = data.pic || ''
-
-		if (coverUrl) {
-			if (coverUrl.startsWith('//'))
-				coverUrl = `https:${coverUrl}`
-			else if (coverUrl.startsWith('http://'))
-				coverUrl = coverUrl.replace('http://', 'https://')
-			coverUrl = `/api/bilibili-image?url=${encodeURIComponent(coverUrl)}`
-		}
-
-		videoInfoCache.value[bvid] = {
-			title: data.title,
-			desc: data.desc,
-			cover: coverUrl,
-			author: data.owner?.name,
-			duration: data.duration,
-			view: data.stat?.view,
-			bvid: data.bvid,
-		}
-		return videoInfoCache.value[bvid]
-	}
-	catch (error) {
-		console.error('获取视频信息失败:', error)
-		return null
-	}
-}
-
 function isYoutubeVideoId(str: string): boolean {
 	return Boolean(str && !str.startsWith('BV') && !str.startsWith('av') && /^[\w-]{11}$/.test(str))
 }
 
-async function fetchYoutubeVideoInfo(videoId: string) {
-	if (!videoId || youtubeVideoCache.value[videoId])
-		return youtubeVideoCache.value[videoId] || null
-
-	youtubeVideoCache.value[videoId] = {
-		title: 'YouTube 视频',
-		cover: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
-		videoId,
-		url: `https://www.youtube.com/watch?v=${videoId}`,
-	}
-	return youtubeVideoCache.value[videoId]
-}
-
-async function fetchMusicInfo(musicId: string) {
-	if (!musicId || musicInfoCache.value[musicId])
-		return musicInfoCache.value[musicId] || null
-
-	const isUrl = musicId.startsWith('http')
-	const defaultInfo = {
-		title: 'QQ音乐分享',
-		artist: 'QQ音乐',
-		album: '',
-		cover: '',
-		musicId,
-		url: isUrl ? musicId : `https://y.qq.com/n/ryqq/songDetail/${musicId}`,
-	}
-
-	if (isUrl) {
-		musicInfoCache.value[musicId] = defaultInfo
-		return defaultInfo
-	}
-
-	try {
-		const data: any = await $fetch(`/api/qq-music?song_mid=${musicId}`)
-		const info = data?.songinfo?.data?.track_info
-
-		if (info) {
-			const albumMid = info.album?.mid || ''
-			musicInfoCache.value[musicId] = {
-				title: info.name || '音乐分享',
-				artist: info.singer?.map((s: any) => s.name).join(' / ') || 'QQ音乐',
-				album: info.album?.name || '',
-				cover: albumMid ? `https://y.qq.com/music/photo_new/T002R300x300M000${albumMid}.jpg` : '',
-				musicId,
-				url: `https://y.qq.com/n/ryqq/songDetail/${musicId}`,
-			}
-			return musicInfoCache.value[musicId]
-		}
-
-		console.warn('QQ音乐API返回数据格式异常:', data)
-	}
-	catch (error) {
-		console.error('无法从QQ音乐API获取信息:', error)
-	}
-
-	musicInfoCache.value[musicId] = defaultInfo
-	return defaultInfo
-}
 function updateDisplayedMoments() {
 	const endIndex = Math.min(currentIndex.value + pageSize, allMomentsData.value.length)
 	const newMoments = allMomentsData.value.slice(currentIndex.value, endIndex)
@@ -363,15 +266,6 @@ function handleExtensionClick(moment: DisplayMoment) {
 			moment.extension!.startsWith('http')
 				? moment.extension!
 				: `https://github.com/${moment.extension}`,
-		VIDEO: () =>
-			isYoutubeVideoId(moment.extension!)
-				? `https://www.youtube.com/watch?v=${moment.extension}`
-				: `https://www.bilibili.com/video/${moment.extension}`,
-		YOUTUBE: () => `https://www.youtube.com/watch?v=${moment.extension}`,
-		MUSIC: () =>
-			moment.extension!.startsWith('http')
-				? moment.extension!
-				: `https://y.qq.com/n/ryqq/songDetail/${moment.extension}`,
 	}
 
 	try {
@@ -414,13 +308,6 @@ onMounted(() => {
 watch(displayedMoments, async (moments) => {
 	const fetchHandlers: Record<string, (ext: string) => Promise<any>> = {
 		GITHUBPROJ: fetchGithubRepoInfo,
-		YOUTUBE: fetchYoutubeVideoInfo,
-		MUSIC: fetchMusicInfo,
-		VIDEO: async (ext: string) => {
-			return isYoutubeVideoId(ext)
-				? fetchYoutubeVideoInfo(ext)
-				: fetchBilibiliVideoInfo(ext)
-		},
 	}
 
 	for (const moment of moments) {
@@ -535,108 +422,11 @@ onUnmounted(() => {
 					</div>
 
 					<!-- 视频 (B站 或 YouTube) -->
-					<div v-else-if="moment.extension_type === 'VIDEO'" class="video-card" :class="{ 'youtube-card': moment.extension && isYoutubeVideoId(moment.extension) }" @click="handleExtensionClick(moment)">
-						<!-- YouTube 视频 -->
-						<template v-if="moment.extension && isYoutubeVideoId(moment.extension)">
-							<div v-if="youtubeVideoCache[moment.extension]?.cover" class="video-preview">
-								<img
-									:src="youtubeVideoCache[moment.extension].cover"
-									alt="视频封面"
-									class="video-cover"
-									loading="lazy"
-									@error="(e) => (e.target as HTMLImageElement).style.display = 'none'"
-								>
-								<div class="play-overlay">
-									<Icon name="ph:play-circle-fill" class="play-icon" />
-								</div>
-								<div class="youtube-badge">
-									<Icon name="simple-icons:youtube" />
-								</div>
-							</div>
-							<div v-else class="video-icon-placeholder">
-								<Icon name="simple-icons:youtube" class="ext-icon youtube-icon" />
-							</div>
-							<div class="ext-info">
-								<h4 class="ext-title">
-									{{ youtubeVideoCache[moment.extension]?.title || 'YouTube 视频' }}
-								</h4>
-								<p class="ext-url">
-									{{ moment.extension }}
-								</p>
-							</div>
-						</template>
-						<!-- B站视频 -->
-						<template v-else>
-							<div v-if="moment.extension && videoInfoCache[moment.extension]?.cover" class="video-preview">
-								<img
-									:src="videoInfoCache[moment.extension].cover"
-									alt="视频封面"
-									class="video-cover"
-									loading="lazy"
-									@error="(e) => (e.target as HTMLImageElement).style.display = 'none'"
-								>
-								<div class="play-overlay">
-									<Icon name="ph:play-circle-fill" class="play-icon" />
-								</div>
-							</div>
-							<div v-else class="video-icon-placeholder">
-								<Icon name="ph:play-circle-bold" class="ext-icon" />
-							</div>
-							<div class="ext-info">
-								<h4 class="ext-title">
-									{{ moment.extension && videoInfoCache[moment.extension]?.title || '视频分享' }}
-								</h4>
-								<p v-if="moment.extension && videoInfoCache[moment.extension]?.author" class="ext-author">
-									<Icon name="ph:user-circle" /> {{ moment.extension && videoInfoCache[moment.extension].author }}
-								</p>
-								<p v-else class="ext-url">
-									{{ moment.extension }}
-								</p>
-							</div>
-						</template>
-					</div>
-
-					<!-- YouTube视频 -->
-					<div v-else-if="moment.extension_type === 'YOUTUBE'" class="video-card youtube-card" @click="handleExtensionClick(moment)">
-						<div v-if="moment.extension && youtubeVideoCache[moment.extension]?.cover" class="video-preview">
-							<img
-								:src="youtubeVideoCache[moment.extension].cover"
-								alt="视频封面"
-								class="video-cover"
-								loading="lazy"
-								@error="(e) => (e.target as HTMLImageElement).style.display = 'none'"
-							>
-							<div class="play-overlay">
-								<Icon name="ph:play-circle-fill" class="play-icon" />
-							</div>
-							<div class="youtube-badge">
-								<Icon name="simple-icons:youtube" />
-							</div>
-						</div>
-						<div v-else class="video-icon-placeholder">
-							<Icon name="simple-icons:youtube" class="ext-icon youtube-icon" />
-						</div>
-						<div class="ext-info">
-							<h4 class="ext-title">
-								{{ moment.extension && youtubeVideoCache[moment.extension]?.title || 'YouTube 视频' }}
-							</h4>
-							<p class="ext-url">
-								{{ moment.extension }}
-							</p>
-						</div>
-					</div>
-
-					<!-- 音乐 -->
-					<div v-else-if="moment.extension_type === 'MUSIC'" class="music-card" @click="handleExtensionClick(moment)">
-						<Icon name="ph:music-note-bold" class="ext-icon" />
-						<div class="ext-info">
-							<h4 class="ext-title">
-								{{ moment.extension && musicInfoCache[moment.extension]?.title || '音乐分享' }}
-							</h4>
-							<p v-if="moment.extension && musicInfoCache[moment.extension]?.artist" class="ext-artist">
-								<Icon name="ph:user-sound" /> {{ musicInfoCache[moment.extension].artist }}
-							</p>
-						</div>
+					<div v-else-if="moment.extension_type === 'VIDEO' || moment.extension_type === 'YOUTUBE'" class="video-embed-wrapper">
+						<VideoEmbed
+							:id="moment.extension!"
+							:type="moment.extension_type === 'YOUTUBE' || (moment.extension && isYoutubeVideoId(moment.extension)) ? 'youtube' : 'bilibili'"
+						/>
 					</div>
 				</div>				<!-- 图片网格 -->
 				<div v-if="moment.images && moment.images.length > 0" class="image-grid">
@@ -992,9 +782,7 @@ onUnmounted(() => {
   margin: 1rem 0.5rem 0.5rem 0.5rem;
 
   .website-card,
-  .github-card,
-  .video-card,
-  .music-card {
+  .github-card {
     display: flex;
     align-items: center;
     gap: 1rem;
@@ -1126,123 +914,22 @@ onUnmounted(() => {
 	}
 }
 
-  .video-card {
-		position: relative;
-
-		&.youtube-card .video-preview .youtube-badge {
-			position: absolute;
-			bottom: 8px;
-			right: 8px;
-			background: #ff0000;
-			color: white;
-			padding: 4px 8px;
-			border-radius: 4px;
-			display: flex;
-			align-items: center;
-			gap: 4px;
-			font-size: 0.75rem;
-			font-weight: 600;
-			z-index: 1;
-		}
-
-		.youtube-icon {
-			color: #ff0000;
-		}
-
-		.video-preview {
-			position: relative;
-			width: 160px;
-			height: 100px;
-			flex-shrink: 0;
-			border-radius: 8px;
-			overflow: hidden;
-			background: var(--c-bg-mute);
-
-			.video-cover {
-				width: 100%;
-				height: 100%;
-				object-fit: cover;
-				display: block;
-			}
-
-			.play-overlay {
-				position: absolute;
-				top: 0;
-				left: 0;
-				width: 100%;
-				height: 100%;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				background: rgba(0, 0, 0, 0.3);
-
-				.play-icon {
-					font-size: 3rem;
-					color: white;
-					opacity: 0.9;
-				}
-			}
-
-			&:hover .play-overlay {
-				background: rgba(0, 0, 0, 0.5);
-
-				.play-icon {
-					opacity: 1;
-				}
-			}
-		}
-
-		.video-icon-placeholder {
-			width: 160px;
-			height: 100px;
-			flex-shrink: 0;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			background: var(--c-bg-mute);
-			border-radius: 8px;
-		}
-
-		.ext-icon {
-			color: #ff6b6b;
-		}
-
-		.ext-author {
-			display: flex;
-			align-items: center;
-			gap: 0.25rem;
-			font-size: 0.85rem;
-			color: var(--c-text-3);
-			margin: 0.25rem 0 0 0;
-		}
-	}
-
-  .music-card {
-		.ext-icon {
-			color: #10b981;
-		}
-
-		.ext-artist {
-			display: flex;
-			align-items: center;
-			gap: 0.25rem;
-			font-size: 0.85rem;
-			color: var(--c-text-3);
-			margin: 0.25rem 0 0 0;
-
-			svg {
-				font-size: 1em;
-			}
-		}
-	}
+  .video-embed-wrapper {
+    margin-top: 0.5rem;
+    border-radius: 12px;
+    overflow: hidden;
+    :deep(.video) {
+      margin: 0 !important;
+      box-shadow: none !important;
+      border: 1px solid var(--c-border-soft);
+    }
+  }
 
   @media (max-width: 768px) {
     margin: 0.75rem 0 0.25rem 0;
 
     .website-card,
-    .github-card,
-    .video-card,
-    .music-card {
+    .github-card {
       padding: 0.75rem;
       gap: 0.75rem;
 
@@ -1264,23 +951,6 @@ onUnmounted(() => {
 				}
       }
     }
-
-		.video-card {
-			.video-preview {
-				width: 120px;
-				height: 75px;
-
-				.play-overlay .play-icon {
-					font-size: 2.5rem;
-				}
-			}
-
-			.video-icon-placeholder {
-				width: 120px;
-				height: 75px;
-			}
-		}
-
   }
 }
 
