@@ -6,7 +6,8 @@
 [![代码风格](https://img.shields.io/badge/代码风格-ESLint-4B32C3?logo=ESLint)](https://eslint.org/)
 [![代码风格](https://img.shields.io/badge/代码风格-Stylelint-263238?logo=Stylelint)](https://stylelint.io/)
 
-主题基于**上游**[纸鹿摸鱼处](https://blog.zhilu.site/)大佬的主题开发，原主题链接[Github](https://github.com/L33Z22L11/blog-v3)
+主题基于**上游**[纸鹿摸鱼处](https://blog.zhilu.site/)大佬的主题二次改造
+原主题链接[Github](https://github.com/L33Z22L11/blog-v3)
 
 ## 使用本主题的博客
 
