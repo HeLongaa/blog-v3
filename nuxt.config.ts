@@ -1,7 +1,9 @@
+import type { NitroConfig } from 'nitropack'
 import process from 'node:process'
 import ci from 'ci-info'
-import blogConfig, { routeRules } from './blog.config'
+import blogConfig from './blog.config'
 import packageJson from './package.json'
+import redirectList from './redirects.json'
 
 // 此处配置无需修改
 export default defineNuxtConfig({
@@ -16,12 +18,13 @@ export default defineNuxtConfig({
 			link: [
 				{ rel: 'icon', href: blogConfig.favicon },
 				{ rel: 'alternate', type: 'application/atom+xml', href: '/atom.xml' },
-				{ rel: 'preconnect', href: blogConfig.artalk.server },
-				{ rel: 'stylesheet', href: `${blogConfig.artalk.server}/dist/Artalk.css` },
+				{ rel: 'preconnect', href: blogConfig.twikoo.preload },
 				{ rel: 'stylesheet', href: 'https://lib.baomitu.com/KaTeX/0.16.9/katex.min.css' },
-				// 思源黑体 "Noto Sans SC", 思源宋体 "Noto Serif SC", "JetBrains Mono"
+				// "InterVariable", "Inter", "InterDisplay"
+				{ rel: 'stylesheet', href: 'https://rsms.me/inter/inter.css' },
+				// "JetBrains Mono", 思源黑体 "Noto Sans SC", 思源宋体 "Noto Serif SC"
 				{ rel: 'preconnect', href: 'https://fonts.gstatic.cn', crossorigin: '' },
-				{ rel: 'stylesheet', href: 'https://fonts.googleapis.cn/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Noto+Sans+SC:wght@100..900&family=Noto+Serif+SC:wght@200..900&display=swap' },
+				{ rel: 'stylesheet', href: 'https://fonts.googleapis.cn/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Noto+Sans+SC:wght@100..900&family=Noto+Serif+SC:wght@200..900&display=swap' },
 				// 小米字体 "MiSans"
 				{ rel: 'stylesheet', href: 'https://cdn-font.hyperos.mi.com/font/css?family=MiSans:100,200,300,400,450,500,600,650,700,900:Chinese_Simplify,Latin&display=swap' },
 			],
@@ -35,23 +38,7 @@ export default defineNuxtConfig({
 			id: 'z-root',
 		},
 	},
-	nitro: {
-		prerender: {
-			ignore: [
-				// 忽略包含百分号的路径（通常是编码后的中文锚点被错误识别为路径）
-				(path: string) => path.includes('%'),
-			],
-			failOnError: false,
-		},
-		routeRules: {
-			...routeRules,
-			// 确保静态资源不被优化处理
-			'/assets/**': { headers: { 'Cache-Control': 'max-age=31536000' } },
-		},
-		externals: {
-			inline: ['h3', 'unhead'],
-		},
-	},
+
 	compatibilityDate: '2024-08-03',
 
 	components: [
@@ -64,6 +51,7 @@ export default defineNuxtConfig({
 		'@/assets/css/animation.scss',
 		'@/assets/css/article.scss',
 		'@/assets/css/color.scss',
+		'@/assets/css/font.scss',
 		'@/assets/css/main.scss',
 		'@/assets/css/reusable.scss',
 	],
@@ -72,7 +60,18 @@ export default defineNuxtConfig({
 		inlineStyles: false,
 	},
 
-	routeRules,
+	// @keep-sorted
+	routeRules: {
+		...Object.entries(redirectList)
+			.reduce<NitroConfig['routeRules']>((acc, [from, to]) => {
+				acc![from] = { redirect: { to, statusCode: 308 } }
+				return acc
+			}, {}),
+		'/api/stats': { prerender: true, headers: { 'Content-Type': 'application/json' } },
+		'/atom.xml': { prerender: true, headers: { 'Content-Type': 'application/xml' } },
+		'/favicon.ico': { redirect: { to: blogConfig.favicon } },
+		'/zhilu.opml': { prerender: true, headers: { 'Content-Type': 'application/xml' } },
+	},
 
 	runtimeConfig: {
 		public: {
@@ -130,12 +129,6 @@ export default defineNuxtConfig({
 				toc: { depth: 4, searchDepth: 4 },
 			},
 		},
-		markdown: {
-			mdc: true,
-		},
-		experimental: {
-			// clientDB: true,
-		},
 	},
 
 	hooks: {
@@ -147,14 +140,16 @@ ${packageJson.homepage}
 ================================
 `)
 		},
-		'content:file:afterParse': (ctx: any) => {
-			// 在 URL 中隐藏指定目录前缀的路径
-			for (const prefix of blogConfig.hideContentPrefixes) {
+		'content:file:afterParse': (ctx) => {
+			const permalink = ctx.content.permalink as string
+			if (permalink) {
+				ctx.content.path = permalink
+				return
+			}
+			// 在 URL 中隐藏文件路由自动生成的 /posts 路径前缀
+			if (blogConfig.article.hidePostPrefix) {
 				const realPath = ctx.content.path as string
-				if (realPath.startsWith(prefix)) {
-					ctx.content.original_dir = prefix
-					ctx.content.path = realPath.replace(prefix, '')
-				}
+				ctx.content.path = realPath.replace(/^\/posts/, '')
 			}
 		},
 	},
@@ -166,23 +161,23 @@ ${packageJson.homepage}
 	},
 
 	image: {
-		// 只在运行时处理图像，避免预渲染时的URI错误
-		provider: process.env.NODE_ENV === 'development' ? 'ipx' : 'ipx',
-		domains: blogConfig.imageDomains,
-		format: ['webp'],
-		quality: 80,
-		// 配置IPX选项
-		ipx: {
-			modifiers: {
-				format: 'webp',
-				quality: 80,
-			},
-		},
+		// Netlify 需要特殊处理
+		provider: process.env.NUXT_IMAGE_PROVIDER,
+		format: ['avif', 'webp'],
+	},
+
+	linkChecker: {
+		// @keep-sorted
+		skipInspections: [
+			'no-baseless',
+			'no-non-ascii-chars',
+			'no-uppercase-chars',
+		],
 	},
 
 	robots: {
 		disableNuxtContentIntegration: true,
-		disallow: blogConfig.robotsNotIndex,
+		disallow: blogConfig.article.robotsNotIndex,
 	},
 
 	site: {
