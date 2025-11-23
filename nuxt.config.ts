@@ -36,10 +36,20 @@ export default defineNuxtConfig({
 		},
 	},
 	nitro: {
+		prerender: {
+			ignore: [
+				// 忽略包含百分号的路径（通常是编码后的中文锚点被错误识别为路径）
+				(path: string) => path.includes('%'),
+			],
+			failOnError: false,
+		},
 		routeRules: {
 			...routeRules,
 			// 确保静态资源不被优化处理
 			'/assets/**': { headers: { 'Cache-Control': 'max-age=31536000' } },
+		},
+		externals: {
+			inline: ['h3'],
 		},
 	},
 	compatibilityDate: '2024-08-03',
