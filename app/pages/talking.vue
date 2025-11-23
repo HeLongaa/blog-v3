@@ -324,23 +324,20 @@ onUnmounted(() => {
 </script>
 
 <template>
-<!-- <div class="moments-container"> -->
-<header class="moments-header">
-	<h3 class="moments-title">
+<header class="f-header">
+	<h3 class="f-title">
 		瞬间
 	</h3>
-	<p class="moments-desc">
+	<p class="f-desc">
 		生活需要仪式感，保持记录可以让人变得自律。
 	</p>
 </header>
-
-<div class="moments-list">
+<div class="posts-container">
 	<!-- 初始加载状态 -->
-	<div v-if="loading" class="loading-indicator">
+	<div v-if="loading" class="loading-container">
 		<Icon name="ph:circle-notch" class="loading-icon" />
 		<span>加载中...</span>
 	</div>
-
 	<TransitionGroup v-else name="moment" tag="div" appear>
 		<div
 			v-for="({ moment, flatIndex }) in flattenedMoments"
@@ -357,7 +354,7 @@ onUnmounted(() => {
 
 			<div class="moment-meta">
 				<a :href="moment.avatarLink" class="avatar-link">
-					<img :src="moment.avatar" :alt="moment.name" class="avatar">
+					<img :src="moment.avatar" :alt="moment.name" class="author-avatar">
 				</a>
 				<div class="info">
 					<div class="moment-nick">
@@ -395,7 +392,7 @@ onUnmounted(() => {
 								{{ parseExtensionData(moment.extension).site }}
 							</p>
 						</div>
-					</div>					<!-- GitHub项目卡片（自动拉取信息） -->
+					</div>
 					<div v-else-if="moment.extension_type === 'GITHUBPROJ'" class="github-card" @click="handleExtensionClick(moment)">
 						<img
 							v-if="moment.extension && githubRepoCache[moment.extension]?.logo"
@@ -422,13 +419,13 @@ onUnmounted(() => {
 					</div>
 
 					<!-- 视频 (B站 或 YouTube) -->
-					<div v-else-if="moment.extension_type === 'VIDEO' || moment.extension_type === 'YOUTUBE'" class="video-embed-wrapper">
+					<div v-else-if="moment.extension_type === 'VIDEO' || moment.extension_type === 'YOUTUBE'" class="video">
 						<VideoEmbed
 							:id="moment.extension!"
 							:type="moment.extension_type === 'YOUTUBE' || (moment.extension && isYoutubeVideoId(moment.extension)) ? 'youtube' : 'bilibili'"
 						/>
 					</div>
-				</div>				<!-- 图片网格 -->
+				</div>
 				<div v-if="moment.images && moment.images.length > 0" class="image-grid">
 					<figure
 						v-for="(img, imgIndex) in moment.images"
@@ -479,53 +476,9 @@ onUnmounted(() => {
 <div id="comment-section">
 	<PostComment />
 </div>
-<!-- </div> -->
 </template>
 
 <style lang="scss" scoped>
-//.moments-container {
-//  max-width: 800px;
-//  margin: 0 auto;
-//  padding: 0 1rem;
-//
-//  @media (max-width: 768px) {
-//    padding: 1rem 0.5rem;
-//  }
-//}
-
-.moments-header {
-  container-type: inline-size;
-  margin: 2rem 1rem;
-}
-
-.moments-title {
-  color: transparent;
-  font-family: var(--font-stroke-free);
-  font-size: 5em;
-  font-weight: 800;
-  line-height: 1;
-  margin-bottom: -.3em;
-  -webkit-mask-image: linear-gradient(#fff 50%, transparent);
-  mask-image: linear-gradient(#fff 50%, transparent);
-  opacity: .5;
-  position: sticky;
-  text-align: center;
-  top: 0;
-  transition: color .2s;
-  z-index: -1;
-  -webkit-text-stroke: 1px var(--c-text-3);
-}
-
-.moments-title::selection,
-.moments-header:hover .moments-title {
-  color: var(--c-text-3);
-}
-
-.moments-desc {
-  text-align: center;
-  color: var(--c-text-2);
-}
-
 .moments-list {
   margin: 2rem 0.5rem 2rem 0.5rem;
 }
@@ -586,18 +539,6 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 1rem;
-
-  .avatar {
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid var(--c-border);
-
-    @media (max-width: 768px) {
-      width: 44px;
-      height: 44px;
-    }
   }
 
   .info {
@@ -626,7 +567,6 @@ onUnmounted(() => {
     color: var(--c-text-3);
     margin-top: 0.25rem;
   }
-}
 
 .moment-content {
   min-height: 1.5rem;
@@ -745,22 +685,6 @@ onUnmounted(() => {
     color: var(--c-bg);
   }
 }
-
-.loading-indicator,
-.no-more {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 2rem;
-  color: var(--c-text-2);
-  font-size: 0.9rem;
-
-  .loading-icon {
-    animation: spin 1s linear infinite;
-  }
-}
-
 .empty-state {
   text-align: center;
   padding: 4rem 2rem;
@@ -777,184 +701,6 @@ onUnmounted(() => {
   }
 }
 
-// 扩展内容样式
-.extension-content {
-  margin: 1rem 0.5rem 0.5rem 0.5rem;
-
-  .website-card,
-  .github-card {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    background: var(--c-bg-2);
-    border: 1px solid var(--c-border-soft);
-    border-radius: 12px;
-    padding: 1rem;
-    cursor: pointer;
-
-    &:hover {
-      background: var(--c-bg-2);
-      border-color: var(--c-brand);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-
-    .ext-icon {
-      font-size: 2.5rem;
-      flex-shrink: 0;
-    }
-
-    .ext-info {
-      flex: 1;
-      min-width: 0;
-
-      .ext-title {
-        font-size: 1rem;
-        font-weight: 600;
-        color: var(--c-text-1);
-        margin: 0 0 0.25rem 0;
-        line-height: 1.2;
-      }
-
-      .ext-url {
-        font-size: 0.9rem;
-        color: var(--c-text-2);
-        margin: 0;
-        word-break: break-all;
-        line-height: 1.3;
-      }
-    }
-  }
-
-  .website-card {
-		.website-icon {
-			width: 48px;
-			height: 48px;
-			flex-shrink: 0;
-			object-fit: contain;
-			border-radius: 8px;
-		}
-
-		.ext-icon {
-			color: #2563eb;
-		}
-	}
-
-	.github-card .ext-icon {
-		color: #333;
-		@media (prefers-color-scheme: dark) {
-			color: var(--c-text-2);
-		}
-	}
-
-.github-card {
-	display: flex;
-	align-items: center;
-	gap: 1rem;
-	background: var(--c-bg-2);
-	border: 1px solid var(--c-border-soft);
-	border-radius: 12px;
-	padding: 1rem;
-	cursor: pointer;
-	box-sizing: border-box;
-
-	&:hover {
-		background: var(--c-bg-2);
-		border-color: var(--c-brand);
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-	}
-
-	.github-logo {
-		width: 48px;
-		height: 48px;
-		border-radius: 8px;
-		object-fit: contain;
-		background: #fff;
-		border: 1px solid var(--c-border);
-		margin-right: 1rem;
-		flex-shrink: 0;
-	}
-
-	.ext-info {
-		flex: 1;
-		min-width: 0;
-
-		.ext-title {
-			font-size: 1.1rem;
-			font-weight: 700;
-			color: var(--c-text-1);
-			margin: 0 0 0.25rem 0;
-			line-height: 1.2;
-		}
-		.ext-desc {
-			font-size: 0.95rem;
-			color: var(--c-text-2);
-			margin: 0 0 0.5rem 0;
-			line-height: 1.3;
-			word-break: break-all;
-		}
-		.ext-meta {
-			display: flex;
-			gap: 1.2em;
-			align-items: center;
-			font-size: 0.95rem;
-			color: var(--c-text-3);
-			.ext-star, .ext-fork {
-				display: inline-flex;
-				align-items: center;
-				gap: 0.3em;
-				svg {
-					font-size: 1em;
-					color: #ffb300;
-				}
-			}
-			.ext-fork svg {
-				color: #8e8e8e;
-			}
-		}
-	}
-}
-
-  .video-embed-wrapper {
-    margin-top: 0.5rem;
-    border-radius: 12px;
-    overflow: hidden;
-    :deep(.video) {
-      margin: 0 !important;
-      box-shadow: none !important;
-      border: 1px solid var(--c-border-soft);
-    }
-  }
-
-  @media (max-width: 768px) {
-    margin: 0.75rem 0 0.25rem 0;
-
-    .website-card,
-    .github-card {
-      padding: 0.75rem;
-      gap: 0.75rem;
-
-      .ext-icon {
-        font-size: 2rem;
-      }
-
-      .ext-info {
-        .ext-title {
-          font-size: 0.9rem;
-        }
-
-        .ext-url {
-          font-size: 0.8rem;
-        }
-
-				.ext-author {
-					font-size: 0.8rem;
-				}
-      }
-    }
-  }
-}
-
-// 动作按钮样式
 .moment-actions {
   display: flex;
   align-items: center;
@@ -991,15 +737,6 @@ onUnmounted(() => {
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
   }
 }
 

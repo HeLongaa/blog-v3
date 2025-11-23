@@ -50,8 +50,10 @@ function updateDisplayedPosts() {
 }
 
 async function loadAllPosts(forceRefresh = false) {
-	if (!initialLoading.value)
-		loading.value = true
+	if (forceRefresh)
+		initialLoading.value = true
+
+	loading.value = true
 
 	const resetState = (posts: FriendPost[] = []) => {
 		allPosts.value = posts
@@ -125,58 +127,56 @@ onMounted(() => loadAllPosts())
 </header>
 
 <div class="posts-container">
-	<div v-if="initialLoading" class="loading-container">
+	<div v-if="loading && initialLoading" class="loading-container">
 		<Icon name="ph:circle-notch" class="loading-icon" />
-		<span>正在加载朋友动态...</span>
+		<span>加载中...</span>
 	</div>
 
-	<div v-else class="posts-list">
-		<TransitionGroup name="post" tag="div" class="post-grid" appear>
-			<article
-				v-for="(post, index) in displayedPosts"
-				:key="`${post.site_name}-${post.title}-${index}`"
-				class="post-card card"
-				:style="{ '--delay': `${(index % pageSize) * 0.05}s` }"
+	<TransitionGroup name="post" tag="div" class="post-list" appear>
+		<article
+			v-for="(post, index) in displayedPosts"
+			:key="`${post.site_name}-${post.title}-${index}`"
+			class="post-card card"
+			:style="{ '--delay': `${(index % pageSize) * 0.05}s` }"
+		>
+			<a
+				:href="post.link"
+				target="_blank"
+				rel="noopener noreferrer"
+				class="post-link"
 			>
-				<a
-					:href="post.link"
-					target="_blank"
-					rel="noopener noreferrer"
-					class="post-link"
-				>
-					<div class="post-main">
-						<div class="post-header">
-							<img
-								:src="post.icon"
-								:alt="`${post.site_name} avatar`"
-								class="author-avatar"
-								loading="lazy"
-								@error="(e: Event) => {
-									const img = e.target as HTMLImageElement;
-									if (img) img.src = '/favicon.ico'
-								}"
-							>
-							<div class="author-info">
-								<div class="author-details">
-									<h3 class="author-name">{{ decodeHtmlEntities(post.site_name) }}</h3>
-									<p class="post-domain">{{ post.link.match(/:\/\/([^/]+)/)?.[1] || '' }}</p>
-								</div>
+				<div class="post-main">
+					<div class="post-header">
+						<img
+							:src="post.icon"
+							:alt="`${post.site_name} avatar`"
+							class="author-avatar"
+							loading="lazy"
+							@error="(e: Event) => {
+								const img = e.target as HTMLImageElement;
+								if (img) img.src = '/favicon.ico'
+							}"
+						>
+						<div class="author-info">
+							<div class="author-details">
+								<h3 class="author-name">{{ decodeHtmlEntities(post.site_name) }}</h3>
+								<p class="post-domain">{{ post.link.match(/:\/\/([^/]+)/)?.[1] || '' }}</p>
 							</div>
-						</div>
-
-						<div class="post-content">
-							<h2 class="post-title">{{ decodeHtmlEntities(post.title) }}</h2>
-							<p v-if="post.description" class="post-excerpt">
-								{{ stripHtmlAndDecode(post.description).substring(0, 150) }}{{ post.description.length > 150 ? '...' : '' }}
-							</p>
 						</div>
 					</div>
 
-					<time class="post-date">{{ formatDate(post.readable_time) }}</time>
-				</a>
-			</article>
-		</TransitionGroup>
-	</div>
+					<div class="post-content">
+						<h2 class="post-title">{{ decodeHtmlEntities(post.title) }}</h2>
+						<p v-if="post.description" class="post-excerpt">
+							{{ stripHtmlAndDecode(post.description).substring(0, 150) }}{{ post.description.length > 150 ? '...' : '' }}
+						</p>
+					</div>
+				</div>
+
+				<time class="post-date">{{ formatDate(post.readable_time) }}</time>
+			</a>
+		</article>
+	</TransitionGroup>
 
 	<div v-if="loading && !initialLoading" class="loading-more">
 		<Icon name="ph:circle-notch" class="loading-icon" />
@@ -200,68 +200,6 @@ onMounted(() => loadAllPosts())
 </template>
 
 <style lang="scss" scoped>
-.f-header {
-  container-type: inline-size;
-  margin: 2rem 1rem;
-}
-
-.f-title {
-  color: transparent;
-  font-family: var(--font-stroke-free);
-  font-size: 5em;
-  font-weight: 800;
-  line-height: 1;
-  margin-bottom: -.3em;
-  -webkit-mask-image: linear-gradient(#fff 50%, transparent);
-  mask-image: linear-gradient(#fff 50%, transparent);
-  opacity: .5;
-  position: sticky;
-  text-align: center;
-  top: 0;
-  transition: color .2s;
-  z-index: -1;
-  -webkit-text-stroke: 1px var(--c-text-3);
-}
-
-.f-title::selection,
-.f-header:hover .f-title {
-  color: var(--c-text-3);
-}
-
-.f-desc {
-  text-align: center;
-  color: var(--c-text-2);
-}
-
-.loading-container,
-.loading-more,
-.no-more {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
-  padding: 1rem;
-  color: var(--c-text-2);
-  font-size: 1.1rem;
-
-  .loading-icon {
-    font-size: 1.5rem;
-    animation: spin 1s linear infinite;
-    color: var(--c-brand);
-  }
-}
-.posts-container{
-  margin: 0 0.5rem
-}
-
-.post-card {
-  &:hover {
-    .post-title {
-      color: var(--c-primary);
-    }
-  }
-}
-
 .post-link {
   display: flex;
   align-items: flex-start;
@@ -290,21 +228,6 @@ onMounted(() => loadAllPosts())
   align-items: center;
   gap: 0.75rem;
 }
-
-.author-avatar {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid var(--c-border);
-  transition: border-color 0.2s ease;
-
-  @media (max-width: 768px) {
-    width: 40px;
-    height: 40px;
-  }
-}
-
 .author-details {
   .author-name {
     font-size: 1rem;
@@ -462,15 +385,6 @@ onMounted(() => loadAllPosts())
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
   }
 }
 </style>

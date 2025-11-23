@@ -18,7 +18,7 @@ layoutStore.setAside(['blog-stats', 'friend-posts', 'blog-tech', 'comm-group'])
 	</p>
 </header>
 <div class="messages-content">
-	<div class="welcome-card">
+	<div class="welcome-card card">
 		<div class="welcome-icon">
 			<Icon name="ph:hand-waving" />
 		</div>
@@ -43,176 +43,11 @@ layoutStore.setAside(['blog-stats', 'friend-posts', 'blog-tech', 'comm-group'])
 </template>
 
 <style lang="scss" scoped>
-.f-header {
-  container-type: inline-size;
-  margin: 2rem 1rem;
-}
-
-.f-title {
-  color: transparent;
-  font-family: var(--font-stroke-free);
-  font-size: 5em;
-  font-weight: 800;
-  line-height: 1;
-  margin-bottom: -.3em;
-  -webkit-mask-image: linear-gradient(#fff 50%, transparent);
-  mask-image: linear-gradient(#fff 50%, transparent);
-  opacity: .5;
-  position: sticky;
-  text-align: center;
-  top: 0;
-  transition: color .2s;
-  z-index: -1;
-  -webkit-text-stroke: 1px var(--c-text-3);
-}
-
-.f-title::selection,
-.f-header:hover .f-title {
-  color: var(--c-text-3);
-}
-
-.f-desc {
-  text-align: center;
-  color: var(--c-text-2);
-}
-
 .messages-content {
   display: flex;
   flex-direction: column;
 }
 .z-comment{
   margin: 0 0.5rem !important;
-}
-
-.welcome-card {
-  background: var(--ld-bg-card);
-  border-radius: 0.8rem;
-  padding: 1.5rem 2rem;
-  display: flex;
-  gap: 1.5rem;
-  align-items: center;
-  transition: all 0.3s ease;
-  margin: 0.5rem;
-  box-shadow: 0 .1em .2em var(--ld-shadow);
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    text-align: center;
-    padding: 1.5rem;
-    gap: 1rem;
-  }
-}
-
-.welcome-icon {
-  font-size: 3rem;
-  color: var(--c-brand);
-  flex-shrink: 0;
-
-  @media (max-width: 768px) {
-    font-size: 2.5rem;
-  }
-}
-
-.welcome-text {
-  flex: 1;
-
-  h3 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: var(--c-text-1);
-    margin: 0 0 1rem 0;
-
-    @media (max-width: 768px) {
-      font-size: 1.3rem;
-    }
-  }
-
-  p {
-    color: var(--c-text-2);
-    line-height: 1.6;
-    margin: 0 0 1rem 0;
-  }
-
-  ul {
-    list-style: none;
-    padding: 0;
-    margin: 1rem 0;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 0.5rem;
-
-    @media (max-width: 768px) {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  li {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--c-text-2);
-    font-size: 0.95rem;
-
-    svg {
-      color: var(--c-brand);
-      font-size: 1.1rem;
-      flex-shrink: 0;
-    }
-  }
-}
-.notice {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  background: var(--c-bg-mute);
-  padding: 0.75rem 1rem;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  margin: 1.5rem auto 0;
-
-  svg {
-    color: var(--c-brand);
-    font-size: 1.1rem;
-    flex-shrink: 0;
-  }
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    text-align: center;
-    gap: 0.25rem;
-  }
-}
-// 动画效果
-.messages-page {
-  animation: fade-in 0.6s ease-out;
-}
-
-@keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.welcome-card {
-  animation: slide-up 0.6s ease-out backwards;
-}
-
-.welcome-card { animation-delay: 0.1s; }
-
-@keyframes slide-up {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 </style>

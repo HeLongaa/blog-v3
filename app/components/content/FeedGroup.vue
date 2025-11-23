@@ -22,10 +22,10 @@ function getCardDelay(feed: FeedEntry) {
 </h2>
 
 <section v-for="group in feeds" :key="group.name" class="feed-group">
-	<h3 class="feed-title">
+	<h3 class="f-title">
 		{{ group.name }}
 	</h3>
-	<p class="feed-desc">
+	<p class="f-desc">
 		{{ group.desc }}
 	</p>
 	<TransitionGroup tag="menu" class="feed-list" appear name="float-in">
@@ -46,35 +46,8 @@ function getCardDelay(feed: FeedEntry) {
 }
 
 .feed-group {
-	// position: relative;
 	container-type: inline-size;
 	margin: 2rem 1rem;
-}
-
-.feed-title {
-	color: transparent;
-    font-family: var(--font-stroke-free);
-    font-size: 5em;
-    font-weight: 800;
-    line-height: 1;
-    margin-bottom: -.3em;
-    -webkit-mask-image: linear-gradient(#fff 50%, transparent);
-    mask-image: linear-gradient(#fff 50%, transparent);
-    opacity: .5;
-    position: sticky;
-    text-align: center;
-    top: 0;
-    transition: color .2s;
-    z-index: -1;
-    -webkit-text-stroke: 1px var(--c-text-3);
-	&::selection, :hover > & {
-		color: var(--c-text-3);
-	}
-}
-
-.feed-desc {
-	text-align: center;
-	color: var(--c-text-2);
 }
 
 .feed-list {

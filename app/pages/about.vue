@@ -11,11 +11,11 @@ useSeoMeta({
 
 <template>
 <div class="main">
-	<header class="about-header">
-		<h3 class="about-title">
+	<header class="f-header">
+		<h3 class="f-title">
 			关于
 		</h3>
-		<p class="about-desc">
+		<p class="f-desc">
 			对于我和这个博客站点的说明，不定时更新
 		</p>
 	</header>
@@ -84,38 +84,6 @@ useSeoMeta({
 </template>
 
 <style lang="scss" scoped>
-.about-header {
-  container-type: inline-size;
-  margin: 2rem 1rem;
-}
-
-.about-title {
-  color: transparent;
-  font-family: var(--font-stroke-free);
-  font-size: 5em;
-  font-weight: 800;
-  line-height: 1;
-  margin-bottom: -.3em;
-  -webkit-mask-image: linear-gradient(#fff 50%, transparent);
-  mask-image: linear-gradient(#fff 50%, transparent);
-  opacity: .5;
-  position: sticky;
-  text-align: center;
-  top: 0;
-  transition: color .2s;
-  z-index: -1;
-  -webkit-text-stroke: 1px var(--c-text-3);
-}
-
-.about-title::selection,
-.about-header:hover .about-title {
-  color: var(--c-text-3);
-}
-
-.about-desc {
-  text-align: center;
-  color: var(--c-text-2);
-}
 .skill-list{
   iconify-icon{
     margin-right: 0.5rem;

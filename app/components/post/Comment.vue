@@ -199,7 +199,7 @@ onUnmounted(() => {
 	</h3>
 	<div id="artalk">
 		<p class="loading-box">
-			<Icon name="line-md:loading-twotone-loop" class="loadig-img" />评论加载中...
+			<Icon name="ph:circle-notch" class="loading-icon" />评论加载中...
 		</p>
 	</div>
 </section>
@@ -224,9 +224,6 @@ onUnmounted(() => {
   .loading-box{
     text-align: center;
     font-size: 1.1rem;
-    .loading-img{
-      margin-right: 0.6rem;
-    }
   }
   margin-top: 1rem;
 

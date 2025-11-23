@@ -47,32 +47,3 @@ onMounted(() => {
 	</div>
 </div>
 </template>
-
-<style lang="scss" scoped>
-.floating-buttons{
-  position:fixed; right:min(2rem,5%); bottom:8rem; z-index:90;
-  display:grid; grid-template-rows:0fr;
-  transition:grid-template-rows .3s ease;
-  pointer-events:none;
-  @media (min-width: $breakpoint-widescreen) {
-    bottom: 3rem;
-  }
-  @media (min-width: $breakpoint-mobile) {
-    bottom: 5.3rem;
-  }
-  &.open{ grid-template-rows:1fr; pointer-events:auto; }
-
-  > .inner{
-    overflow:hidden;
-    background:var(--c-bg-soft); backdrop-filter:blur(.5rem);
-    border:1px solid var(--c-border-light); border-radius:.5rem;
-  }
-}
-
-.floating-btn{
-  padding:.5rem; border:0; cursor:pointer;
-  font-size:1.4rem; display:block;
-  transition:background-color .3s ease, color .3s ease, box-shadow .3s ease;
-  &:hover{ background:var(--c-primary); color:var(--c-bg); box-shadow:0 4px 12px #00000040; }
-}
-</style>

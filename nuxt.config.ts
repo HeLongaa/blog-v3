@@ -56,6 +56,7 @@ export default defineNuxtConfig({
 		'@/assets/css/color.scss',
 		'@/assets/css/main.scss',
 		'@/assets/css/reusable.scss',
+		'@/assets/css/HeWidget.scss',
 	],
 
 	features: {
