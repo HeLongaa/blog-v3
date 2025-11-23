@@ -49,7 +49,7 @@ export default defineNuxtConfig({
 			'/assets/**': { headers: { 'Cache-Control': 'max-age=31536000' } },
 		},
 		externals: {
-			inline: ['h3'],
+			inline: ['h3'，'unhead'],
 		},
 	},
 	compatibilityDate: '2024-08-03',
