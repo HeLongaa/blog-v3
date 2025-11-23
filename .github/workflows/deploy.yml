@@ -15,27 +15,19 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '22'  # 使用主版本号，让 GitHub 自动选择最新
-        cache: 'pnpm'
+        node-version: '22'
 
     - name: Install pnpm
-      run: npm install -g pnpm@10.15.0  # 直接使用 npm 安装 pnpm
+      run: npm install -g pnpm@10.15.0
 
-    - name: Verify installations
-      run: |
-        node -v
-        npm -v
-        pnpm -v
+    - name: Verify pnpm installation
+      run: pnpm -v
 
     - name: Install dependencies
       run: pnpm install
 
     - name: Build project
       run: pnpm generate
-
-    - name: List dist directory (for debugging)
-      run: ls -la
-      if: success()
 
     - name: Deploy to FTP
       uses: SamKirkland/FTP-Deploy-Action@v4.3.4
