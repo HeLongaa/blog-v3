@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type ArticleProps from '~/types/article'
-import { onMounted, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import blogConfig from '~~/blog.config'
 import ArtalkManager from '~/utils/artalk-manager'
 
@@ -8,13 +8,14 @@ const props = defineProps<{ useUpdated?: boolean, to?: string } & ArticleProps>(
 
 const appConfig = useAppConfig()
 
-const showAllDate = isTimeDiffSignificant(props.date, props.updated)
+const showAllDate = ref(false)
 
 const categoryLabel = computed(() => props.categories?.[0])
 const categoryColor = computed(() => appConfig.article.categories[categoryLabel.value!]?.color)
 const categoryIcon = computed(() => getCategoryIcon(categoryLabel.value))
 const pageKey = computed(() => props.to || props.path || '')
 onMounted(async () => {
+	showAllDate.value = isTimeDiffSignificant(props.date, props.updated)
 	await loadArtalk()
 })
 
@@ -77,9 +78,9 @@ async function loadArtalk() {
 				</span>
 			</ClientOnly>
 
-			<span v-if="readingTime?.words" class="article-words">
+			<span v-if="readingTime && readingTime.words" class="article-words">
 				<Icon name="ph:paragraph-bold" />
-				{{ formatNumber(readingTime?.words) }}字
+				{{ formatNumber(readingTime.words) }}字
 			</span>
 
 			<span>
